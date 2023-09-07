@@ -5,6 +5,7 @@ import com.eazytest.eazytest.dto.User.UserLoginDto;
 import com.eazytest.eazytest.dto.User.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
+import com.eazytest.eazytest.entity.User.RoleType;
 import com.eazytest.eazytest.entity.User.UserEntity;
 import com.eazytest.eazytest.entity.security.TokenEntity;
 import com.eazytest.eazytest.entity.security.TokenType;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,7 @@ public class AuthServiceImpl implements AuthServiceInterface {
                 .username(userRegister.getUsername())
                 .email(userRegister.getEmail())
                 .password(passwordEncoder.encode(userRegister.getPassword()))
+                .roleTypes(Collections.singleton(RoleType.USER))
                 .build();
 
         userRepository.save(user);

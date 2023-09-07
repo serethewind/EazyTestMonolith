@@ -23,23 +23,29 @@ public class UserInfoService implements UserInfoServiceInterface{
     public ResponseDto updateUserInformation(Long userId, UserInfoUpdateDto userInfoUpdateDto) {
        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-       UserEntity updatedUser = UserEntity.builder()
-               .firstName(userInfoUpdateDto.getFirstname() != null ? userInfoUpdateDto.getFirstname() : user.getFirstName())
-               .lastName(userInfoUpdateDto.getLastname() != null ? userInfoUpdateDto.getLastname() : user.getLastName())
-               .username(userInfoUpdateDto.getUsername() != null ? userInfoUpdateDto.getUsername() : user.getUsername())
-               .email(userInfoUpdateDto.getEmail() != null ? userInfoUpdateDto.getEmail() : user.getEmail())
-               .phoneNumber(userInfoUpdateDto.getPhoneNumber() != null ? userInfoUpdateDto.getPhoneNumber() : user.getPhoneNumber())
-               .dateOfBirth(userInfoUpdateDto.getDateOfBirth() != null ? userInfoUpdateDto.getDateOfBirth() : user.getDateOfBirth())
-               .password(user.getPassword())
-               .build();
+//       UserEntity updatedUser = UserEntity.builder()
+//               .firstName(userInfoUpdateDto.getFirstname() != null ? userInfoUpdateDto.getFirstname() : user.getFirstName())
+//               .lastName(userInfoUpdateDto.getLastname() != null ? userInfoUpdateDto.getLastname() : user.getLastName())
+//               .username(userInfoUpdateDto.getUsername() != null ? userInfoUpdateDto.getUsername() : user.getUsername())
+//               .email(userInfoUpdateDto.getEmail() != null ? userInfoUpdateDto.getEmail() : user.getEmail())
+//               .phoneNumber(userInfoUpdateDto.getPhoneNumber() != null ? userInfoUpdateDto.getPhoneNumber() : user.getPhoneNumber())
+//               .dateOfBirth(userInfoUpdateDto.getDateOfBirth() != null ? userInfoUpdateDto.getDateOfBirth() : user.getDateOfBirth())
+//               .password(user.getPassword())
+//               .build();
 
-       userRepository.save(updatedUser);
+        user.setFirstName(userInfoUpdateDto.getFirstname());
+        user.setLastName(userInfoUpdateDto.getLastname());
+        user.setPhoneNumber(userInfoUpdateDto.getPhoneNumber());
+        user.setDateOfBirth(userInfoUpdateDto.getDateOfBirth());
+
+
+       userRepository.save(user);
        return ResponseDto.builder()
                .message("User details updated successfully")
                .userResponseDto(
                        UserResponseDto.builder()
-                               .userId(updatedUser.getId())
-                               .userName(updatedUser.getUsername())
+                               .userId(user.getId())
+                               .userName(user.getUsername())
                                .build()
                )
                .build();

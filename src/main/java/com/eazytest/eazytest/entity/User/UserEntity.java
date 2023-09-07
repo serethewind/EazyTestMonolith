@@ -23,15 +23,12 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
-    @Column(nullable = false)
     private String firstName;
-    @Column(nullable = false)
     private String lastName;
     @Column(unique = true)
     private String username;
     @Email
     private String email;
-    @Column(nullable = false)
     private String phoneNumber;
     @Column(nullable = false)
     private String password;
@@ -42,13 +39,8 @@ public class UserEntity {
     @OneToOne
     @JoinColumn(name = "participantId")
     private Participant participant;
-    @ManyToMany
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-    )
-    private Set<RoleEntity> roles = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    private Set<RoleType> roleTypes = new HashSet<>();
     @CreationTimestamp
     private LocalDateTime dateCreated;
     @UpdateTimestamp
