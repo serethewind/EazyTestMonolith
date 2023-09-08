@@ -1,4 +1,4 @@
-package com.eazytest.eazytest.entity.User;
+package com.eazytest.eazytest.entity.user;
 
 public enum RoleType {
     EXAMINER, PARTICIPANT, USER

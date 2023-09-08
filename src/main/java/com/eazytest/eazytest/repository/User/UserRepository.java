@@ -1,6 +1,6 @@
 package com.eazytest.eazytest.repository.User;
 
-import com.eazytest.eazytest.entity.User.UserEntity;
+import com.eazytest.eazytest.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

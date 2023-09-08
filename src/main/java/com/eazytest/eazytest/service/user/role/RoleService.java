@@ -2,22 +2,16 @@ package com.eazytest.eazytest.service.user.role;
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.User.Examiner;
-import com.eazytest.eazytest.entity.User.Participant;
-import com.eazytest.eazytest.entity.User.RoleType;
-import com.eazytest.eazytest.entity.User.UserEntity;
+import com.eazytest.eazytest.entity.user.Examiner;
+import com.eazytest.eazytest.entity.user.Participant;
+import com.eazytest.eazytest.entity.user.RoleType;
+import com.eazytest.eazytest.entity.user.UserEntity;
 import com.eazytest.eazytest.repository.User.ExaminerRepository;
 import com.eazytest.eazytest.repository.User.ParticipantRepository;
 import com.eazytest.eazytest.repository.User.UserRepository;
-import com.eazytest.eazytest.service.user.userInfo.UserInfoService;
-import io.jsonwebtoken.Jwt;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.Collections;
 
 @AllArgsConstructor
 @Service

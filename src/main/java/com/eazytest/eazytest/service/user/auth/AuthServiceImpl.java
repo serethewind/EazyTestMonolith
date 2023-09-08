@@ -5,8 +5,8 @@ import com.eazytest.eazytest.dto.User.UserLoginDto;
 import com.eazytest.eazytest.dto.User.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.User.RoleType;
-import com.eazytest.eazytest.entity.User.UserEntity;
+import com.eazytest.eazytest.entity.user.RoleType;
+import com.eazytest.eazytest.entity.user.UserEntity;
 import com.eazytest.eazytest.entity.security.TokenEntity;
 import com.eazytest.eazytest.entity.security.TokenType;
 import com.eazytest.eazytest.repository.User.UserRepository;
@@ -21,11 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor

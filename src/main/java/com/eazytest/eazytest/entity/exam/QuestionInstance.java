@@ -1,4 +1,4 @@
-package com.eazytest.eazytest.entity.Course;
+package com.eazytest.eazytest.entity.exam;
 
 import jakarta.persistence.*;
 import lombok.Getter;

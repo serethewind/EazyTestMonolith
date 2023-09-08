@@ -1,6 +1,6 @@
 package com.eazytest.eazytest.entity.security;
 
-import com.eazytest.eazytest.entity.User.UserEntity;
+import com.eazytest.eazytest.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

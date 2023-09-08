@@ -1,6 +1,6 @@
 package com.eazytest.eazytest.config;
 
-import com.eazytest.eazytest.entity.User.UserEntity;
+import com.eazytest.eazytest.entity.user.UserEntity;
 import com.eazytest.eazytest.repository.User.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

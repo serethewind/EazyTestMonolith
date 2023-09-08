@@ -3,7 +3,7 @@ package com.eazytest.eazytest.service.user.userInfo;
 import com.eazytest.eazytest.dto.User.UserInfoUpdateDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.User.UserEntity;
+import com.eazytest.eazytest.entity.user.UserEntity;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.User.UserRepository;
 import lombok.AllArgsConstructor;
