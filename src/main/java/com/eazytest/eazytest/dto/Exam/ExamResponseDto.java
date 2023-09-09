@@ -12,7 +12,9 @@ import java.util.List;
 @Data
 @Builder
 public class ExamResponseDto {
-    private Long id;
+
     private String sessionName;
-    private List<QuestionResponseDto> listOfQuestions;
+    private String sessionDescription;
+    private String examinerId;
+
 }

@@ -1,6 +1,7 @@
 package com.eazytest.eazytest.entity.exam;
 
 import com.eazytest.eazytest.dto.Exam.CategoryType;
+import com.eazytest.eazytest.dto.Exam.TimeType;
 import com.eazytest.eazytest.entity.user.Examiner;
 import com.eazytest.eazytest.entity.user.Participant;
 import jakarta.persistence.*;
@@ -27,8 +28,10 @@ public class ExamSession {
     private String sessionName;
     private String sessionDescription;
     private CategoryType category;
-    private Long numberOfQuestions;
+    private Integer numberOfQuestions;
     private Boolean isExamActive;
+    private TimeType isTimed;
+    private Long lengthOfTimeInMinutes;
     private List<Long> questionsList;
     @ManyToMany
     @JoinTable(name = "participant_list",

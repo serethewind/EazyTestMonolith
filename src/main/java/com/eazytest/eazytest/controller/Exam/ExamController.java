@@ -2,6 +2,8 @@ package com.eazytest.eazytest.controller.Exam;
 
 import com.eazytest.eazytest.dto.Exam.ActivateSessionDto;
 import com.eazytest.eazytest.dto.Exam.ExamRequestDto;
+import com.eazytest.eazytest.dto.Exam.ExamUpdateRequestDto;
+import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.service.exam.examsession.ExamService;
 import lombok.AllArgsConstructor;
@@ -24,27 +26,27 @@ public class ExamController {
     }
 
     @PutMapping("{id}")
-    ResponseEntity<ResponseDto> updateExamSession(@PathVariable("id") String sessionId, @RequestBody ExamRequestDto examRequestDto){
+    ResponseEntity<ResponseDto> updateExamSession(@PathVariable("id") String sessionId, @RequestBody ExamUpdateRequestDto examRequestDto){
         return new ResponseEntity<>(examService.updateExamSession(sessionId, examRequestDto), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    ResponseEntity<ResponseDto> fetchExamSession(@PathVariable("id") String sessionId){
+    ResponseEntity<ReadResponseDto> fetchExamSession(@PathVariable("id") String sessionId){
         return new ResponseEntity<>(examService.fetchExamSessionById(sessionId), HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    ResponseEntity<List<ResponseDto>> fetchAllExamSessionByExaminer(@RequestParam("examinerId")String examinerId){
+    @GetMapping("{examinerId}")
+    ResponseEntity<ReadResponseDto> fetchAllExamSessionByExaminer(@RequestParam("examinerId")String examinerId){
         return new ResponseEntity<>(examService.fetchAllExamSessionByExaminer(examinerId), HttpStatus.OK);
     }
 
-    @PostMapping("initiate-examsession")
-    ResponseEntity<ResponseDto> initiateExamSessionForParticipants(@RequestBody ActivateSessionDto activateSessionDto){
+    @PostMapping("initiate-examSession")
+    ResponseEntity<ReadResponseDto> initiateExamSessionForParticipants(@RequestBody ActivateSessionDto activateSessionDto){
         return new ResponseEntity<>(examService.initiateExamSessionForParticipants(activateSessionDto), HttpStatus.OK);
     }
 
-    @PostMapping("end-examsession")
-    ResponseEntity<ResponseDto> endExamSessionForParticipants(@RequestBody ActivateSessionDto activateSessionDto){
+    @PostMapping("end-examSession")
+    ResponseEntity<ReadResponseDto> endExamSessionForParticipants(@RequestBody ActivateSessionDto activateSessionDto){
         return new ResponseEntity<>(examService.endExamSessionForParticipants(activateSessionDto), HttpStatus.OK);
     }
 }

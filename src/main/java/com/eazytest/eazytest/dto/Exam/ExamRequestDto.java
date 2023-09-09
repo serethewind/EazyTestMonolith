@@ -17,6 +17,8 @@ public class ExamRequestDto {
     private String sessionName;
     private String sessionDescription;
     private Integer numberOfQuestions;
+    private String isTimed;
+    private Long lengthOfTime;
 //    private List<QuestionViewDto> listOfQuestions;
 
 }

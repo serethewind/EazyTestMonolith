@@ -46,4 +46,17 @@ public class GlobalExceptionHandler {
                         .build(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorDetails> handleBadRequestException(BadRequestException exception, WebRequest webRequest){
+        return new ResponseEntity<>(
+                ErrorDetails.builder()
+                        .timestamp(LocalDateTime.now())
+                        .message(exception.getMessage())
+                        .path(webRequest.getDescription(false))
+                        .errorCode("BAD_REQUEST")
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 }

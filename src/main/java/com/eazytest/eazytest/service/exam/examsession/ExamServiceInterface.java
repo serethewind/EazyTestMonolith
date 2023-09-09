@@ -1,6 +1,8 @@
 package com.eazytest.eazytest.service.exam.examsession;
 import com.eazytest.eazytest.dto.Exam.ActivateSessionDto;
 import com.eazytest.eazytest.dto.Exam.ExamRequestDto;
+import com.eazytest.eazytest.dto.Exam.ExamUpdateRequestDto;
+import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 
 import java.util.List;
@@ -8,13 +10,17 @@ import java.util.List;
 public interface ExamServiceInterface {
     ResponseDto createExamSession(ExamRequestDto examRequestDto);
 
-    ResponseDto updateExamSession(String sessionId, ExamRequestDto examRequestDto);
+    ResponseDto updateExamSession(String sessionId, ExamUpdateRequestDto examUpdateRequestDto);
 
-    ResponseDto fetchExamSessionById(String sessionId);
+    ReadResponseDto fetchExamSessionById(String sessionId);
 
-    List<ResponseDto> fetchAllExamSessionByExaminer(String examinerId);
+    ReadResponseDto fetchAllExamSession();
 
-    ResponseDto initiateExamSessionForParticipants(ActivateSessionDto activateSessionDto);
+    ReadResponseDto fetchExamSessionByExaminer(String examinerId, String sessionId);
 
-    ResponseDto endExamSessionForParticipants(ActivateSessionDto activateSessionDto);
+    ReadResponseDto fetchAllExamSessionByExaminer(String examinerId);
+
+    ReadResponseDto initiateExamSessionForParticipants(ActivateSessionDto activateSessionDto);
+
+    ReadResponseDto endExamSessionForParticipants(ActivateSessionDto activateSessionDto);
 }

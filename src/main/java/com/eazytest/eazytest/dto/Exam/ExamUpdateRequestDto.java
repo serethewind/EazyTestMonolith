@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ActivateSessionDto {
-
+@Data
+public class ExamUpdateRequestDto {
     private String examinerId;
     private String sessionId;
+    private String sessionName;
+    private String sessionDescription;
+    private Integer numberOfQuestions;
 }
