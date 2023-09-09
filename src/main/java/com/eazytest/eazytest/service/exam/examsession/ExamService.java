@@ -50,7 +50,7 @@ public class ExamService implements ExamServiceInterface {
                                 .sessionDescription(examSession.getSessionDescription())
                                 .examinerId(examSession.getExaminer().getExaminerId())
                                 .build()
-                        ))
+                ))
                 .build();
 
     }
@@ -70,7 +70,7 @@ public class ExamService implements ExamServiceInterface {
         examSession.setSessionDescription(examUpdateRequestDto.getSessionDescription());
         examSession.setNumberOfQuestions(examUpdateRequestDto.getNumberOfQuestions());
         examSession.setIsTimed(TimeType.valueOf(examUpdateRequestDto.getIsTimed()));
-        examSession.setLengthOfTimeInMinutes( examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? null : examUpdateRequestDto.getLengthOfTime() );
+        examSession.setLengthOfTimeInMinutes(examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? null : examUpdateRequestDto.getLengthOfTime());
 
         examRepository.save(examSession);
 
@@ -234,23 +234,42 @@ public class ExamService implements ExamServiceInterface {
 
     @Override
     public ReadResponseDto createExamSessionInBatch(List<ExamRequestDto> examRequestDtoList) {
-    String examinerId = examRequestDtoList.stream().map(ExamRequestDto::getExaminerId).findFirst().orElseThrow(() -> new BadRequestException("Empty Batches created"));
+     /*
+     Confirm that the list is not empty by fetching the examinerId of the first item and checking whether it is null.
+     check that this first Id is valid and exist
+     then check if the rest of the ids equals the first
+     then create a batch
+      */
+        String examinerId = examRequestDtoList.stream().map(ExamRequestDto::getExaminerId).findFirst().orElseThrow(() -> new BadRequestException("Empty Batches created"));
 
-    examinerRepository.findById(examinerId).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' does not exist", examinerId)));
+        Examiner examiner = examinerRepository.findById(examinerId).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' does not exist", examinerId)));
 
-    boolean allMatch = examRequestDtoList.stream().allMatch(examInstance -> examInstance.getExaminerId().equals(examinerId));
+        boolean allMatch = examRequestDtoList.stream().allMatch(examInstance -> examInstance.getExaminerId().equals(examinerId));
 
-    if (!allMatch) {
-        throw new BadRequestException("Examiner id doesn't match for all the exam sessions in the batch");
-    }
+        if (!allMatch) {
+            throw new BadRequestException("Examiner id doesn't match for all the exam sessions in the batch");
+        }
 
-    return ReadResponseDto.builder()
-            .message("Exam session batch successfully created")
-            .examResponseDtoList(examRequestDtoList.stream().map(examRequestDto -> ExamResponseDto.builder()
-                    .sessionName(examRequestDto.getSessionName())
-                    .sessionDescription(examRequestDto.getSessionDescription())
-                    .examinerId(examinerId)
-                    .build()).collect(Collectors.toList()))
-            .build();
+       examRequestDtoList.stream().map(examRequestDto -> examRepository.save(
+                ExamSession.builder()
+                        .examiner(examiner)
+                        .sessionName(examRequestDto.getSessionName())
+                        .sessionDescription(examRequestDto.getSessionDescription())
+                        .category(CategoryType.valueOf(examRequestDto.getCategory()))
+                        .numberOfQuestions(examRequestDto.getNumberOfQuestions())
+                        .isExamActive(false) //by default
+                        .isTimed(TimeType.valueOf(examRequestDto.getIsTimed()))
+                        .lengthOfTimeInMinutes((examRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED))) ? null : examRequestDto.getLengthOfTime())
+                        .build()
+        )).collect(Collectors.toList());
+
+        return ReadResponseDto.builder()
+                .message("Exam session batch successfully created")
+                .examResponseDtoList(examRequestDtoList.stream().map(examRequestDto -> ExamResponseDto.builder()
+                        .sessionName(examRequestDto.getSessionName())
+                        .sessionDescription(examRequestDto.getSessionDescription())
+                        .examinerId(examinerId)
+                        .build()).collect(Collectors.toList()))
+                .build();
     }
 }
