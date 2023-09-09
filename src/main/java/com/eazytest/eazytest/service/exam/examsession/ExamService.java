@@ -60,7 +60,7 @@ public class ExamService implements ExamServiceInterface {
 
         //fetch the exam session by id, then ensure that the examiner id of this session matches the examiner in this updated request form.
 
-        ExamSession examSession = examRepository.findById(examUpdateRequestDto.getSessionId()).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", examUpdateRequestDto.getSessionId())));
+        ExamSession examSession = examRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
 
         if (!examSession.getExaminer().getExaminerId().equals(examUpdateRequestDto.getExaminerId())) {
             throw new ResourceNotFoundException("Bad request observed, not authorized to update exam session");
@@ -75,7 +75,7 @@ public class ExamService implements ExamServiceInterface {
         examRepository.save(examSession);
 
         return ReadResponseDto.builder()
-                .message(String.format("Exam session with id: '%s' successfully updated", examUpdateRequestDto.getSessionId()))
+                .message(String.format("Exam session with id: '%s' successfully updated", sessionId))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
                                 .sessionName(examSession.getSessionName())
