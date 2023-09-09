@@ -72,6 +72,8 @@ public class ExamService implements ExamServiceInterface {
         examSession.setSessionName(examUpdateRequestDto.getSessionName());
         examSession.setSessionDescription(examUpdateRequestDto.getSessionDescription());
         examSession.setNumberOfQuestions(examUpdateRequestDto.getNumberOfQuestions());
+        examSession.setIsTimed(TimeType.valueOf(examUpdateRequestDto.getIsTimed()));
+        examSession.setLengthOfTimeInMinutes( examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? null : examUpdateRequestDto.getLengthOfTime() );
 
         examRepository.save(examSession);
 
