@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("api/v1/eazytest/exam-session")
+@RequestMapping("v")
 @RestController
 @AllArgsConstructor
 public class ExamController {
@@ -35,9 +35,19 @@ public class ExamController {
         return new ResponseEntity<>(examService.fetchExamSessionById(sessionId), HttpStatus.OK);
     }
 
-    @GetMapping("{examinerId}")
+    @GetMapping
+    ResponseEntity<ReadResponseDto> fetchAllExamSession(){
+        return new ResponseEntity<>(examService.fetchAllExamSession(), HttpStatus.OK);
+    }
+
+    @GetMapping("examinerId")
     ResponseEntity<ReadResponseDto> fetchAllExamSessionByExaminer(@RequestParam("examinerId")String examinerId){
         return new ResponseEntity<>(examService.fetchAllExamSessionByExaminer(examinerId), HttpStatus.OK);
+    }
+
+    @GetMapping("examinerId/single-exam-session")
+    ResponseEntity<ReadResponseDto> fetchSingleExamSessionByExaminer(@RequestParam("examinerId")String examinerId, @RequestParam("sessionId")String sessionId){
+        return new ResponseEntity<>(examService.fetchExamSessionByExaminer(examinerId, sessionId), HttpStatus.OK);
     }
 
     @PostMapping("initiate-examSession")

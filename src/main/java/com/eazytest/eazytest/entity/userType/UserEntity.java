@@ -2,6 +2,7 @@ package com.eazytest.eazytest.entity.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -38,7 +39,7 @@ public class UserEntity {
     @JoinColumn(name = "participantId")
     private Participant participant;
     @Enumerated(EnumType.STRING)
-    private Set<RoleType> roleTypes = new HashSet<>();
+    private Set<RoleEnum> roleEnums = new HashSet<>();
     @CreationTimestamp
     private LocalDateTime dateCreated;
     @UpdateTimestamp

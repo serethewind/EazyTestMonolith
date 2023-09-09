@@ -5,18 +5,14 @@ import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
 import com.eazytest.eazytest.entity.exam.ExamSession;
-import com.eazytest.eazytest.entity.user.Examiner;
-import com.eazytest.eazytest.entity.user.UserEntity;
+import com.eazytest.eazytest.entity.userType.Examiner;
 import com.eazytest.eazytest.exception.BadRequestException;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.User.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,13 +42,11 @@ public class ExamService implements ExamServiceInterface {
         examinerRepository.save(examiner);
         examRepository.save(examSession);
 
-        UserEntity user = examSession.getExaminer().getUserEntity();
-
         return ResponseDto.builder()
                 .message(String.format("Exam session with id: %s created successfully", examSession.getSessionId()))
                 .userResponseDto(UserResponseDto.builder()
-                        .userId(user.getId())
-                        .userName(user.getUsername())
+                        .userId(examSession.getExaminer().getUserEntity().getId())
+                        .userName(examSession.getExaminer().getUserEntity().getUsername())
                         .build())
                 .build();
 
@@ -77,13 +71,11 @@ public class ExamService implements ExamServiceInterface {
 
         examRepository.save(examSession);
 
-        UserEntity user = examSession.getExaminer().getUserEntity();
-
         return ResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' successfully updated", examUpdateRequestDto.getSessionId()))
                 .userResponseDto(UserResponseDto.builder()
-                        .userId(user.getId())
-                        .userName(user.getUsername())
+                        .userId(examSession.getExaminer().getUserEntity().getId())
+                        .userName(examSession.getExaminer().getUserEntity().getUsername())
                         .build())
                 .build();
 
@@ -178,7 +170,7 @@ public class ExamService implements ExamServiceInterface {
          *or
          *
          * first ensure examiner exist
-         * then ensure that the sessionId is part of the sessions belonging to the examniner
+         * then ensure that the sessionId is part of the sessions belonging to the examiner
          * then check status
          * since by default, it is false, let this method return true
          * if the method is already true, throw an exception that the exam session is already active
