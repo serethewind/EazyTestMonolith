@@ -2,10 +2,10 @@ package com.eazytest.eazytest.service.user.role;
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.user.Examiner;
-import com.eazytest.eazytest.entity.user.Participant;
-import com.eazytest.eazytest.entity.user.RoleType;
-import com.eazytest.eazytest.entity.user.UserEntity;
+import com.eazytest.eazytest.entity.userType.Examiner;
+import com.eazytest.eazytest.entity.userType.Participant;
+import com.eazytest.eazytest.entity.userType.RoleEnum;
+import com.eazytest.eazytest.entity.userType.UserEntity;
 import com.eazytest.eazytest.repository.User.ExaminerRepository;
 import com.eazytest.eazytest.repository.User.ParticipantRepository;
 import com.eazytest.eazytest.repository.User.UserRepository;
@@ -25,7 +25,7 @@ public class RoleService implements RoleServiceInteface {
     public ResponseDto assignParticipantRole(Long userId) {
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        userEntity.getRoleTypes().add(RoleType.PARTICIPANT);
+        userEntity.getRoleEnums().add(RoleEnum.PARTICIPANT);
         Participant participant = Participant.builder()
                 .userEntity(userEntity)
                 .build();
@@ -48,7 +48,7 @@ public class RoleService implements RoleServiceInteface {
     @Override
     public ResponseDto assignExaminerRole(Long userId) {
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        userEntity.getRoleTypes().add(RoleType.EXAMINER);
+        userEntity.getRoleEnums().add(RoleEnum.EXAMINER);
 
         Examiner examiner = Examiner.builder()
                 .userEntity(userEntity)

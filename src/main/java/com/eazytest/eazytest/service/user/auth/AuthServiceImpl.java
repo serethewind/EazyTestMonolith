@@ -5,8 +5,8 @@ import com.eazytest.eazytest.dto.User.UserLoginDto;
 import com.eazytest.eazytest.dto.User.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.user.RoleType;
-import com.eazytest.eazytest.entity.user.UserEntity;
+import com.eazytest.eazytest.entity.userType.RoleEnum;
+import com.eazytest.eazytest.entity.userType.UserEntity;
 import com.eazytest.eazytest.entity.security.TokenEntity;
 import com.eazytest.eazytest.entity.security.TokenType;
 import com.eazytest.eazytest.repository.User.UserRepository;
@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthServiceInterface {
                 .username(userRegister.getUsername())
                 .email(userRegister.getEmail())
                 .password(passwordEncoder.encode(userRegister.getPassword()))
-                .roleTypes(Collections.singleton(RoleType.USER))
+                .roleEnums(Collections.singleton(RoleEnum.USER))
                 .build();
 
         userRepository.save(user);

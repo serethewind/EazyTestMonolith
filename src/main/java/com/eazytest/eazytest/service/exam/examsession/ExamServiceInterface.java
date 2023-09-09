@@ -8,9 +8,9 @@ import com.eazytest.eazytest.dto.general.ResponseDto;
 import java.util.List;
 
 public interface ExamServiceInterface {
-    ResponseDto createExamSession(ExamRequestDto examRequestDto);
+    ReadResponseDto createExamSession(ExamRequestDto examRequestDto);
 
-    ResponseDto updateExamSession(String sessionId, ExamUpdateRequestDto examUpdateRequestDto);
+    ReadResponseDto updateExamSession(String sessionId, ExamUpdateRequestDto examUpdateRequestDto);
 
     ReadResponseDto fetchExamSessionById(String sessionId);
 
@@ -23,4 +23,6 @@ public interface ExamServiceInterface {
     ReadResponseDto initiateExamSessionForParticipants(ActivateSessionDto activateSessionDto);
 
     ReadResponseDto endExamSessionForParticipants(ActivateSessionDto activateSessionDto);
+
+    ReadResponseDto createExamSessionInBatch(List<ExamRequestDto> examRequestDtoList);
 }

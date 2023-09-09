@@ -24,7 +24,7 @@ public class ExamService implements ExamServiceInterface {
     private ExaminerRepository examinerRepository;
 
     @Override
-    public ResponseDto createExamSession(ExamRequestDto examRequestDto) {
+    public ReadResponseDto createExamSession(ExamRequestDto examRequestDto) {
         Examiner examiner = examinerRepository.findById(examRequestDto.getExaminerId()).orElseThrow(() -> new ResourceNotFoundException("Examiner with examinerId : " + examRequestDto.getExaminerId() + "not found"));
 
         ExamSession examSession = ExamSession.builder()
@@ -42,18 +42,21 @@ public class ExamService implements ExamServiceInterface {
         examinerRepository.save(examiner);
         examRepository.save(examSession);
 
-        return ResponseDto.builder()
+        return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: %s created successfully", examSession.getSessionId()))
-                .userResponseDto(UserResponseDto.builder()
-                        .userId(examSession.getExaminer().getUserEntity().getId())
-                        .userName(examSession.getExaminer().getUserEntity().getUsername())
-                        .build())
+                .examResponseDtoList(Collections.singletonList(
+                        ExamResponseDto.builder()
+                                .sessionName(examSession.getSessionName())
+                                .sessionDescription(examSession.getSessionDescription())
+                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .build()
+                        ))
                 .build();
 
     }
 
     @Override
-    public ResponseDto updateExamSession(String sessionId, ExamUpdateRequestDto examUpdateRequestDto) {
+    public ReadResponseDto updateExamSession(String sessionId, ExamUpdateRequestDto examUpdateRequestDto) {
 
         //fetch the exam session by id, then ensure that the examiner id of this session matches the examiner in this updated request form.
 
@@ -71,12 +74,15 @@ public class ExamService implements ExamServiceInterface {
 
         examRepository.save(examSession);
 
-        return ResponseDto.builder()
+        return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' successfully updated", examUpdateRequestDto.getSessionId()))
-                .userResponseDto(UserResponseDto.builder()
-                        .userId(examSession.getExaminer().getUserEntity().getId())
-                        .userName(examSession.getExaminer().getUserEntity().getUsername())
-                        .build())
+                .examResponseDtoList(Collections.singletonList(
+                        ExamResponseDto.builder()
+                                .sessionName(examSession.getSessionName())
+                                .sessionDescription(examSession.getSessionDescription())
+                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .build()
+                ))
                 .build();
 
     }
@@ -224,5 +230,27 @@ public class ExamService implements ExamServiceInterface {
                                 .build()
                 ))
                 .build();
+    }
+
+    @Override
+    public ReadResponseDto createExamSessionInBatch(List<ExamRequestDto> examRequestDtoList) {
+    String examinerId = examRequestDtoList.stream().map(ExamRequestDto::getExaminerId).findFirst().orElseThrow(() -> new BadRequestException("Empty Batches created"));
+
+    examinerRepository.findById(examinerId).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' does not exist", examinerId)));
+
+    boolean allMatch = examRequestDtoList.stream().allMatch(examInstance -> examInstance.getExaminerId().equals(examinerId));
+
+    if (!allMatch) {
+        throw new BadRequestException("Examiner id doesn't match for all the exam sessions in the batch");
+    }
+
+    return ReadResponseDto.builder()
+            .message("Exam session batch successfully created")
+            .examResponseDtoList(examRequestDtoList.stream().map(examRequestDto -> ExamResponseDto.builder()
+                    .sessionName(examRequestDto.getSessionName())
+                    .sessionDescription(examRequestDto.getSessionDescription())
+                    .examinerId(examinerId)
+                    .build()).collect(Collectors.toList()))
+            .build();
     }
 }
