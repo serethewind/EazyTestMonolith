@@ -11,6 +11,7 @@ import com.eazytest.eazytest.repository.exam.ExamRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class ExamService implements ExamServiceInterface {
                 .numberOfQuestions(examRequestDto.getNumberOfQuestions())
                 .isExamActive(false) //by default
                 .isTimed(TimeType.valueOf(examRequestDto.getIsTimed()))
-                .lengthOfTimeInMinutes((examRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED))) ? null : examRequestDto.getLengthOfTime())
+                .lengthOfTimeInMinutes((examRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED))) ? Long.MAX_VALUE : examRequestDto.getLengthOfTime())
                 .build();
 
         examinerType.getExamInstances().add(examInstance);
@@ -44,6 +45,7 @@ public class ExamService implements ExamServiceInterface {
                 .message(String.format("Exam session with id: %s created successfully", examInstance.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
+                                .sessionId(examInstance.getSessionId())
                                 .sessionName(examInstance.getSessionName())
                                 .sessionDescription(examInstance.getSessionDescription())
                                 .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -68,7 +70,7 @@ public class ExamService implements ExamServiceInterface {
         examInstance.setSessionDescription(examUpdateRequestDto.getSessionDescription());
         examInstance.setNumberOfQuestions(examUpdateRequestDto.getNumberOfQuestions());
         examInstance.setIsTimed(TimeType.valueOf(examUpdateRequestDto.getIsTimed()));
-        examInstance.setLengthOfTimeInMinutes(examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? null : examUpdateRequestDto.getLengthOfTime());
+        examInstance.setLengthOfTimeInMinutes(examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? Long.MAX_VALUE : examUpdateRequestDto.getLengthOfTime());
 
         examRepository.save(examInstance);
 
@@ -76,6 +78,7 @@ public class ExamService implements ExamServiceInterface {
                 .message(String.format("Exam session with id: '%s' successfully updated", sessionId))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
+                                .sessionId(examInstance.getSessionId())
                                 .sessionName(examInstance.getSessionName())
                                 .sessionDescription(examInstance.getSessionDescription())
                                 .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -93,6 +96,7 @@ public class ExamService implements ExamServiceInterface {
                 .message(String.format("Exam session with id: '%s' successfully found", sessionId))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
+                                .sessionId(examInstance.getSessionId())
                                 .sessionName(examInstance.getSessionName())
                                 .sessionDescription(examInstance.getSessionDescription())
                                 .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -113,6 +117,7 @@ public class ExamService implements ExamServiceInterface {
                 .examResponseDtoList(
                         examInstanceList.stream().map(examInstance ->
                                 ExamResponseDto.builder()
+                                        .sessionId(examInstance.getSessionId())
                                         .sessionName(examInstance.getSessionName())
                                         .sessionDescription(examInstance.getSessionDescription())
                                         .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -135,6 +140,7 @@ public class ExamService implements ExamServiceInterface {
                 .examResponseDtoList(
                         Collections.singletonList(
                                 ExamResponseDto.builder()
+                                        .sessionId(foundExamInstance.getSessionId())
                                         .sessionName(foundExamInstance.getSessionName())
                                         .sessionDescription(foundExamInstance.getSessionDescription())
                                         .examinerId(foundExamInstance.getExaminerClass().getExaminerId())
@@ -157,6 +163,7 @@ public class ExamService implements ExamServiceInterface {
                 .examResponseDtoList(
                         examInstanceList.stream().map(examInstance ->
                                 ExamResponseDto.builder()
+                                        .sessionId(examInstance.getSessionId())
                                         .sessionName(examInstance.getSessionName())
                                         .sessionDescription(examInstance.getSessionDescription())
                                         .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -194,6 +201,7 @@ public class ExamService implements ExamServiceInterface {
                 .message(String.format("Exam session with id: '%s' is now active for participants to take", activateSessionDto.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
+                                .sessionId(examInstance.getSessionId())
                                 .sessionName(examInstance.getSessionName())
                                 .sessionDescription(examInstance.getSessionDescription())
                                 .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -222,6 +230,7 @@ public class ExamService implements ExamServiceInterface {
                 .message(String.format("Exam session with id: '%s' has been made inactive and is unavailable for participants to take", activateSessionDto.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
+                                .sessionId(examInstance.getSessionId())
                                 .sessionName(examInstance.getSessionName())
                                 .sessionDescription(examInstance.getSessionDescription())
                                 .examinerId(examInstance.getExaminerClass().getExaminerId())
@@ -248,7 +257,7 @@ public class ExamService implements ExamServiceInterface {
             throw new BadRequestException("Examiner id doesn't match for all the exam sessions in the batch");
         }
 
-       examRequestDtoList.stream().map(examRequestDto -> examRepository.save(
+     List<ExamInstance> examInstanceList =  examRequestDtoList.stream().map(examRequestDto -> examRepository.save(
                 ExamInstance.builder()
                         .examinerClass(examinerType)
                         .sessionName(examRequestDto.getSessionName())
@@ -263,9 +272,10 @@ public class ExamService implements ExamServiceInterface {
 
         return ReadResponseDto.builder()
                 .message("Exam session batch successfully created")
-                .examResponseDtoList(examRequestDtoList.stream().map(examRequestDto -> ExamResponseDto.builder()
-                        .sessionName(examRequestDto.getSessionName())
-                        .sessionDescription(examRequestDto.getSessionDescription())
+                .examResponseDtoList(examInstanceList.stream().map(examInstance -> ExamResponseDto.builder()
+                        .sessionId(examInstance.getSessionId())
+                        .sessionName(examInstance.getSessionName())
+                        .sessionDescription(examInstance.getSessionDescription())
                         .examinerId(examinerId)
                         .build()).collect(Collectors.toList()))
                 .build();
