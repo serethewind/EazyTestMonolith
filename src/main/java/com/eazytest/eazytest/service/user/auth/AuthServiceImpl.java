@@ -6,7 +6,7 @@ import com.eazytest.eazytest.dto.User.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
 import com.eazytest.eazytest.entity.userType.RoleEnum;
-import com.eazytest.eazytest.entity.userType.UserEntity;
+import com.eazytest.eazytest.entity.userType.UserType;
 import com.eazytest.eazytest.entity.security.TokenEntity;
 import com.eazytest.eazytest.entity.security.TokenType;
 import com.eazytest.eazytest.repository.User.UserRepository;
@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthServiceInterface {
                     , HttpStatus.CONFLICT);
         }
 
-        UserEntity user = UserEntity.builder()
+        UserType user = UserType.builder()
                 .username(userRegister.getUsername())
                 .email(userRegister.getEmail())
                 .password(passwordEncoder.encode(userRegister.getPassword()))
@@ -75,14 +75,14 @@ public class AuthServiceImpl implements AuthServiceInterface {
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserEntity user = userRepository.findByUsername(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserType user = userRepository.findByUsername(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 
         String token = jwtService.generateToken(authentication.getName());
 
         revokeValidTokens(user);
         TokenEntity tokenEntity = TokenEntity.builder()
-                .userEntity(user)
+                .userType(user)
                 .token(token)
                 .tokenType(TokenType.BEARER)
                 .expired(false)
@@ -99,7 +99,7 @@ public class AuthServiceImpl implements AuthServiceInterface {
                 .build());
     }
 
-    private void revokeValidTokens(UserEntity user) {
+    private void revokeValidTokens(UserType user) {
         List<TokenEntity> tokenEntityList = tokenRepository.findAllValidTokensByUser(user.getId());
         if (tokenEntityList.isEmpty())
             return;

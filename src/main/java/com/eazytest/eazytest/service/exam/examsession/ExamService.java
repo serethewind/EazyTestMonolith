@@ -2,10 +2,8 @@ package com.eazytest.eazytest.service.exam.examsession;
 
 import com.eazytest.eazytest.dto.Exam.*;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
-import com.eazytest.eazytest.dto.general.ResponseDto;
-import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.exam.ExamSession;
-import com.eazytest.eazytest.entity.userType.Examiner;
+import com.eazytest.eazytest.entity.exam.ExamInstance;
+import com.eazytest.eazytest.entity.userType.ExaminerType;
 import com.eazytest.eazytest.exception.BadRequestException;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.User.ExaminerRepository;
@@ -25,10 +23,10 @@ public class ExamService implements ExamServiceInterface {
 
     @Override
     public ReadResponseDto createExamSession(ExamRequestDto examRequestDto) {
-        Examiner examiner = examinerRepository.findById(examRequestDto.getExaminerId()).orElseThrow(() -> new ResourceNotFoundException("Examiner with examinerId : " + examRequestDto.getExaminerId() + "not found"));
+        ExaminerType examinerType = examinerRepository.findById(examRequestDto.getExaminerId()).orElseThrow(() -> new ResourceNotFoundException("Examiner with examinerId : " + examRequestDto.getExaminerId() + "not found"));
 
-        ExamSession examSession = ExamSession.builder()
-                .examiner(examiner)
+        ExamInstance examInstance = ExamInstance.builder()
+                .examinerClass(examinerType)
                 .sessionName(examRequestDto.getSessionName())
                 .sessionDescription(examRequestDto.getSessionDescription())
                 .category(CategoryType.valueOf(examRequestDto.getCategory()))
@@ -38,17 +36,17 @@ public class ExamService implements ExamServiceInterface {
                 .lengthOfTimeInMinutes((examRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED))) ? null : examRequestDto.getLengthOfTime())
                 .build();
 
-        examiner.getExamSessionList().add(examSession);
-        examinerRepository.save(examiner);
-        examRepository.save(examSession);
+        examinerType.getExamInstances().add(examInstance);
+        examinerRepository.save(examinerType);
+        examRepository.save(examInstance);
 
         return ReadResponseDto.builder()
-                .message(String.format("Exam session with id: %s created successfully", examSession.getSessionId()))
+                .message(String.format("Exam session with id: %s created successfully", examInstance.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
-                                .sessionName(examSession.getSessionName())
-                                .sessionDescription(examSession.getSessionDescription())
-                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .sessionName(examInstance.getSessionName())
+                                .sessionDescription(examInstance.getSessionDescription())
+                                .examinerId(examInstance.getExaminerClass().getExaminerId())
                                 .build()
                 ))
                 .build();
@@ -60,27 +58,27 @@ public class ExamService implements ExamServiceInterface {
 
         //fetch the exam session by id, then ensure that the examiner id of this session matches the examiner in this updated request form.
 
-        ExamSession examSession = examRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
+        ExamInstance examInstance = examRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
 
-        if (!examSession.getExaminer().getExaminerId().equals(examUpdateRequestDto.getExaminerId())) {
+        if (!examInstance.getExaminerClass().getExaminerId().equals(examUpdateRequestDto.getExaminerId())) {
             throw new ResourceNotFoundException("Bad request observed, not authorized to update exam session");
         }
 
-        examSession.setSessionName(examUpdateRequestDto.getSessionName());
-        examSession.setSessionDescription(examUpdateRequestDto.getSessionDescription());
-        examSession.setNumberOfQuestions(examUpdateRequestDto.getNumberOfQuestions());
-        examSession.setIsTimed(TimeType.valueOf(examUpdateRequestDto.getIsTimed()));
-        examSession.setLengthOfTimeInMinutes(examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? null : examUpdateRequestDto.getLengthOfTime());
+        examInstance.setSessionName(examUpdateRequestDto.getSessionName());
+        examInstance.setSessionDescription(examUpdateRequestDto.getSessionDescription());
+        examInstance.setNumberOfQuestions(examUpdateRequestDto.getNumberOfQuestions());
+        examInstance.setIsTimed(TimeType.valueOf(examUpdateRequestDto.getIsTimed()));
+        examInstance.setLengthOfTimeInMinutes(examUpdateRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED)) ? null : examUpdateRequestDto.getLengthOfTime());
 
-        examRepository.save(examSession);
+        examRepository.save(examInstance);
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' successfully updated", sessionId))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
-                                .sessionName(examSession.getSessionName())
-                                .sessionDescription(examSession.getSessionDescription())
-                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .sessionName(examInstance.getSessionName())
+                                .sessionDescription(examInstance.getSessionDescription())
+                                .examinerId(examInstance.getExaminerClass().getExaminerId())
                                 .build()
                 ))
                 .build();
@@ -89,15 +87,15 @@ public class ExamService implements ExamServiceInterface {
 
     @Override
     public ReadResponseDto fetchExamSessionById(String sessionId) {
-        ExamSession examSession = examRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
+        ExamInstance examInstance = examRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' successfully found", sessionId))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
-                                .sessionName(examSession.getSessionName())
-                                .sessionDescription(examSession.getSessionDescription())
-                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .sessionName(examInstance.getSessionName())
+                                .sessionDescription(examInstance.getSessionDescription())
+                                .examinerId(examInstance.getExaminerClass().getExaminerId())
                                 .build()
                 ))
                 .build();
@@ -105,19 +103,19 @@ public class ExamService implements ExamServiceInterface {
 
     @Override
     public ReadResponseDto fetchAllExamSession() {
-        List<ExamSession> examSessionList = examRepository.findAll();
-        if (examSessionList.isEmpty()) {
+        List<ExamInstance> examInstanceList = examRepository.findAll();
+        if (examInstanceList.isEmpty()) {
             throw new ResourceNotFoundException("Resource not found");
         }
 
         return ReadResponseDto.builder()
                 .message("List of exam session successfully fetched")
                 .examResponseDtoList(
-                        examSessionList.stream().map(examSession ->
+                        examInstanceList.stream().map(examInstance ->
                                 ExamResponseDto.builder()
-                                        .sessionName(examSession.getSessionName())
-                                        .sessionDescription(examSession.getSessionDescription())
-                                        .examinerId(examSession.getExaminer().getExaminerId())
+                                        .sessionName(examInstance.getSessionName())
+                                        .sessionDescription(examInstance.getSessionDescription())
+                                        .examinerId(examInstance.getExaminerClass().getExaminerId())
                                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -125,21 +123,21 @@ public class ExamService implements ExamServiceInterface {
 
     @Override
     public ReadResponseDto fetchExamSessionByExaminer(String examinerId, String sessionId) {
-        List<ExamSession> examSessionList = examRepository.findByExaminerId(examinerId);
-        if (examSessionList.isEmpty()) {
+        List<ExamInstance> examInstanceList = examRepository.findByExaminerId(examinerId);
+        if (examInstanceList.isEmpty()) {
             throw new ResourceNotFoundException(String.format("No exam session associated with Examiner with id: '%s'", examinerId));
         }
 
-        ExamSession foundExamSession = examSessionList.stream().filter(exam -> exam.getSessionId().equals(sessionId)).findFirst().orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
+        ExamInstance foundExamInstance = examInstanceList.stream().filter(exam -> exam.getSessionId().equals(sessionId)).findFirst().orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session associated with Examiner with id: '%s' successfully fetched", examinerId))
                 .examResponseDtoList(
                         Collections.singletonList(
                                 ExamResponseDto.builder()
-                                        .sessionName(foundExamSession.getSessionName())
-                                        .sessionDescription(foundExamSession.getSessionDescription())
-                                        .examinerId(foundExamSession.getExaminer().getExaminerId())
+                                        .sessionName(foundExamInstance.getSessionName())
+                                        .sessionDescription(foundExamInstance.getSessionDescription())
+                                        .examinerId(foundExamInstance.getExaminerClass().getExaminerId())
                                         .build()
                         )
                 )
@@ -148,20 +146,20 @@ public class ExamService implements ExamServiceInterface {
 
     @Override
     public ReadResponseDto fetchAllExamSessionByExaminer(String examinerId) {
-        List<ExamSession> examSessionList = examRepository.findAll().stream().filter(examSession -> examSession.getExaminer().getExaminerId().equals(examinerId)).toList();
+        List<ExamInstance> examInstanceList = examRepository.findAll().stream().filter(examInstance -> examInstance.getExaminerClass().getExaminerId().equals(examinerId)).toList();
 
-        if (examSessionList.isEmpty()) {
+        if (examInstanceList.isEmpty()) {
             throw new ResourceNotFoundException(String.format("No exam session associated with examiner with id: '%s'", examinerId));
         }
 
         return ReadResponseDto.builder()
                 .message(String.format("All exam sessions created by examiner with id: '%s' successfully fetched", examinerId))
                 .examResponseDtoList(
-                        examSessionList.stream().map(examSession ->
+                        examInstanceList.stream().map(examInstance ->
                                 ExamResponseDto.builder()
-                                        .sessionName(examSession.getSessionName())
-                                        .sessionDescription(examSession.getSessionDescription())
-                                        .examinerId(examSession.getExaminer().getExaminerId())
+                                        .sessionName(examInstance.getSessionName())
+                                        .sessionDescription(examInstance.getSessionDescription())
+                                        .examinerId(examInstance.getExaminerClass().getExaminerId())
                                         .build()).collect(Collectors.toList())
                 )
                 .build();
@@ -182,23 +180,23 @@ public class ExamService implements ExamServiceInterface {
          * if the method is already true, throw an exception that the exam session is already active
          */
 
-        Examiner examiner = examinerRepository.findById(activateSessionDto.getExaminerId()).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' not found", activateSessionDto.getExaminerId())));
+        ExaminerType examinerType = examinerRepository.findById(activateSessionDto.getExaminerId()).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' not found", activateSessionDto.getExaminerId())));
 
-        ExamSession examSession = examiner.getExamSessionList().stream().filter(examSessionEntity -> examSessionEntity.getSessionId().equals(activateSessionDto.getSessionId())).findFirst().orElseThrow(() -> new BadRequestException("This session can only be activated by Examiner that owns the session"));
+        ExamInstance examInstance = examinerType.getExamInstances().stream().filter(examInstanceEntity -> examInstanceEntity.getSessionId().equals(activateSessionDto.getSessionId())).findFirst().orElseThrow(() -> new BadRequestException("This session can only be activated by Examiner that owns the session"));
 
-        if (examSession.getIsExamActive()) {
+        if (examInstance.getIsExamActive()) {
             throw new BadRequestException("Exam session is already initiated");
         }
-        examSession.setIsExamActive(true);
-        examRepository.save(examSession);
+        examInstance.setIsExamActive(true);
+        examRepository.save(examInstance);
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' is now active for participants to take", activateSessionDto.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
-                                .sessionName(examSession.getSessionName())
-                                .sessionDescription(examSession.getSessionDescription())
-                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .sessionName(examInstance.getSessionName())
+                                .sessionDescription(examInstance.getSessionDescription())
+                                .examinerId(examInstance.getExaminerClass().getExaminerId())
                                 .build()
                 ))
                 .build();
@@ -207,26 +205,26 @@ public class ExamService implements ExamServiceInterface {
     @Override
     public ReadResponseDto endExamSessionForParticipants(ActivateSessionDto activateSessionDto) {
 
-        ExamSession examSession = examRepository.findById(activateSessionDto.getSessionId()).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found.", activateSessionDto.getSessionId())));
+        ExamInstance examInstance = examRepository.findById(activateSessionDto.getSessionId()).orElseThrow(() -> new ResourceNotFoundException(String.format("Exam session with id: '%s' not found.", activateSessionDto.getSessionId())));
 
-        if (!examSession.getExaminer().getExaminerId().equals(activateSessionDto.getExaminerId())) {
+        if (!examInstance.getExaminerClass().getExaminerId().equals(activateSessionDto.getExaminerId())) {
             throw new BadRequestException("This session can only be ended by owner");
         }
 
-        if (!examSession.getIsExamActive()) {
+        if (!examInstance.getIsExamActive()) {
             throw new BadRequestException("Exam session is currently inactive. Bad request!");
         }
 
-        examSession.setIsExamActive(false);
-        examRepository.save(examSession);
+        examInstance.setIsExamActive(false);
+        examRepository.save(examInstance);
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' has been made inactive and is unavailable for participants to take", activateSessionDto.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
                         ExamResponseDto.builder()
-                                .sessionName(examSession.getSessionName())
-                                .sessionDescription(examSession.getSessionDescription())
-                                .examinerId(examSession.getExaminer().getExaminerId())
+                                .sessionName(examInstance.getSessionName())
+                                .sessionDescription(examInstance.getSessionDescription())
+                                .examinerId(examInstance.getExaminerClass().getExaminerId())
                                 .build()
                 ))
                 .build();
@@ -242,7 +240,7 @@ public class ExamService implements ExamServiceInterface {
       */
         String examinerId = examRequestDtoList.stream().map(ExamRequestDto::getExaminerId).findFirst().orElseThrow(() -> new BadRequestException("Empty Batches created"));
 
-        Examiner examiner = examinerRepository.findById(examinerId).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' does not exist", examinerId)));
+        ExaminerType examinerType = examinerRepository.findById(examinerId).orElseThrow(() -> new ResourceNotFoundException(String.format("Examiner with id: '%s' does not exist", examinerId)));
 
         boolean allMatch = examRequestDtoList.stream().allMatch(examInstance -> examInstance.getExaminerId().equals(examinerId));
 
@@ -251,8 +249,8 @@ public class ExamService implements ExamServiceInterface {
         }
 
        examRequestDtoList.stream().map(examRequestDto -> examRepository.save(
-                ExamSession.builder()
-                        .examiner(examiner)
+                ExamInstance.builder()
+                        .examinerClass(examinerType)
                         .sessionName(examRequestDto.getSessionName())
                         .sessionDescription(examRequestDto.getSessionDescription())
                         .category(CategoryType.valueOf(examRequestDto.getCategory()))

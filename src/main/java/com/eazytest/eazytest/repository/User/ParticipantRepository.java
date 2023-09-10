@@ -1,7 +1,7 @@
 package com.eazytest.eazytest.repository.User;
 
-import com.eazytest.eazytest.entity.user.Participant;
+import com.eazytest.eazytest.entity.userType.ParticipantType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ParticipantRepository extends JpaRepository<Participant, String> {
+public interface ParticipantRepository extends JpaRepository<ParticipantType, String> {
 }

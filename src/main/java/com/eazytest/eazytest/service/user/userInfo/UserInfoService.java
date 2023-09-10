@@ -3,7 +3,7 @@ package com.eazytest.eazytest.service.user.userInfo;
 import com.eazytest.eazytest.dto.User.UserInfoUpdateDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.userType.UserEntity;
+import com.eazytest.eazytest.entity.userType.UserType;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.User.UserRepository;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ public class UserInfoService implements UserInfoServiceInterface{
 
     @Override
     public ResponseDto updateUserInformation(Long userId, UserInfoUpdateDto userInfoUpdateDto) {
-       UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+       UserType user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
 //       UserEntity updatedUser = UserEntity.builder()
 //               .firstName(userInfoUpdateDto.getFirstname() != null ? userInfoUpdateDto.getFirstname() : user.getFirstName())
@@ -62,7 +62,7 @@ public class UserInfoService implements UserInfoServiceInterface{
 
     @Override
     public UserResponseDto findUserById(Long id) {
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("user not found"));
+        UserType user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("user not found"));
         return UserResponseDto.builder()
                 .userId(user.getId())
                 .userName(user.getUsername())

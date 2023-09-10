@@ -1,6 +1,7 @@
 package com.eazytest.eazytest.config;
 
-import com.eazytest.eazytest.entity.user.UserEntity;
+
+import com.eazytest.eazytest.entity.userType.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,11 +17,11 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private Set<GrantedAuthority> grantedAuthorities;
 
-    public CustomUserDetails(UserEntity user) {
+    public CustomUserDetails(UserType user) {
         this.email = user.getEmail();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.grantedAuthorities = user.getRoleTypes().stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toSet());
+        this.grantedAuthorities = user.getRoleEnums().stream().map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toSet());
     }
 
     @Override

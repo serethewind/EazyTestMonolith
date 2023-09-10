@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/eazytest/auth/**").permitAll()
+                        .requestMatchers("/api/v1/eazytest/exam-session").hasAuthority("EXAMINER")
                         .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.logout(logout -> logout

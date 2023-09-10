@@ -1,13 +1,16 @@
 package com.eazytest.eazytest.entity.exam;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "questions")
+@Table
 public class QuestionInstance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +23,4 @@ public class QuestionInstance {
     private String option3;
     private String option4;
     private String rightAnswer;
-
 }

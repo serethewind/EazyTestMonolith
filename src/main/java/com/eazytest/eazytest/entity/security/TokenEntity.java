@@ -1,6 +1,6 @@
 package com.eazytest.eazytest.entity.security;
 
-import com.eazytest.eazytest.entity.user.UserEntity;
+import com.eazytest.eazytest.entity.userType.UserType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,5 +21,5 @@ public class TokenEntity {
     private Boolean revoked;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
+    private UserType userType;
 }

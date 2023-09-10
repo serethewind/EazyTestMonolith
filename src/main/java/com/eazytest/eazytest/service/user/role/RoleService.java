@@ -2,10 +2,10 @@ package com.eazytest.eazytest.service.user.role;
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.userType.Examiner;
-import com.eazytest.eazytest.entity.userType.Participant;
+import com.eazytest.eazytest.entity.userType.ExaminerType;
+import com.eazytest.eazytest.entity.userType.ParticipantType;
 import com.eazytest.eazytest.entity.userType.RoleEnum;
-import com.eazytest.eazytest.entity.userType.UserEntity;
+import com.eazytest.eazytest.entity.userType.UserType;
 import com.eazytest.eazytest.repository.User.ExaminerRepository;
 import com.eazytest.eazytest.repository.User.ParticipantRepository;
 import com.eazytest.eazytest.repository.User.UserRepository;
@@ -23,23 +23,23 @@ public class RoleService implements RoleServiceInteface {
 
     @Override
     public ResponseDto assignParticipantRole(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserType userType = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        userEntity.getRoleEnums().add(RoleEnum.PARTICIPANT);
-        Participant participant = Participant.builder()
-                .userEntity(userEntity)
+        userType.getRoleEnums().add(RoleEnum.PARTICIPANT);
+        ParticipantType participantType = ParticipantType.builder()
+                .userType(userType)
                 .build();
 
-        participantRepository.save(participant);
-        userEntity.setParticipant(participant);
-        userRepository.save(userEntity);
+        participantRepository.save(participantType);
+        userType.setParticipantType(participantType);
+        userRepository.save(userType);
 
     return ResponseDto.builder()
             .message("Participant role successfully assigned to user")
             .userResponseDto(
                     UserResponseDto.builder()
                             .userId(userId)
-                            .userName(userEntity.getUsername())
+                            .userName(userType.getUsername())
                             .build()
             )
             .build();
@@ -47,22 +47,22 @@ public class RoleService implements RoleServiceInteface {
 
     @Override
     public ResponseDto assignExaminerRole(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        userEntity.getRoleEnums().add(RoleEnum.EXAMINER);
+        UserType userType = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        userType.getRoleEnums().add(RoleEnum.EXAMINER);
 
-        Examiner examiner = Examiner.builder()
-                .userEntity(userEntity)
+        ExaminerType examinerType = ExaminerType.builder()
+                .userType(userType)
                 .build();
-        examinerRepository.save(examiner);
-        userEntity.setExaminer(examiner);
-        userRepository.save(userEntity);
+        examinerRepository.save(examinerType);
+        userType.setExaminerType(examinerType);
+        userRepository.save(userType);
 
         return ResponseDto.builder()
                 .message("Examiner role successfully assigned to user")
                 .userResponseDto(
                         UserResponseDto.builder()
                                 .userId(userId)
-                                .userName(userEntity.getUsername())
+                                .userName(userType.getUsername())
                                 .build()
                 )
                 .build();

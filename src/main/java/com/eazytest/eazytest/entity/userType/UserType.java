@@ -1,4 +1,4 @@
-package com.eazytest.eazytest.entity.user;
+package com.eazytest.eazytest.entity.userType;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Builder
-public class UserEntity {
+public class UserType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
@@ -34,10 +34,10 @@ public class UserEntity {
     private LocalDate dateOfBirth;
     @OneToOne
     @JoinColumn(name = "examinerId")
-    private Examiner examiner;
+    private ExaminerType examinerType;
     @OneToOne
     @JoinColumn(name = "participantId")
-    private Participant participant;
+    private ParticipantType participantType;
     @Enumerated(EnumType.STRING)
     private Set<RoleEnum> roleEnums = new HashSet<>();
     @CreationTimestamp

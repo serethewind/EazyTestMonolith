@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("v")
+@RequestMapping("api/v1/eazytest/exam-session")
 @RestController
 @AllArgsConstructor
 public class ExamController {
@@ -21,12 +21,17 @@ public class ExamController {
     private ExamService examService;
 
     @PostMapping
-    ResponseEntity<ResponseDto> createExamSession(@RequestBody ExamRequestDto examRequestDto){
+    ResponseEntity<ReadResponseDto> createExamSession(@RequestBody ExamRequestDto examRequestDto){
         return new ResponseEntity<>(examService.createExamSession(examRequestDto), HttpStatus.CREATED);
     }
 
+    @PostMapping("/batch-creation")
+    ResponseEntity<ReadResponseDto> createExamSessionInBatch(@RequestBody List<ExamRequestDto> examRequestDtoList){
+        return new ResponseEntity<>(examService.createExamSessionInBatch(examRequestDtoList), HttpStatus.CREATED);
+    }
+
     @PutMapping("{id}")
-    ResponseEntity<ResponseDto> updateExamSession(@PathVariable("id") String sessionId, @RequestBody ExamUpdateRequestDto examRequestDto){
+    ResponseEntity<ReadResponseDto> updateExamSession(@PathVariable("id") String sessionId, @RequestBody ExamUpdateRequestDto examRequestDto){
         return new ResponseEntity<>(examService.updateExamSession(sessionId, examRequestDto), HttpStatus.OK);
     }
 

@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class ExamUpdateRequestDto {
     private String examinerId;
-    private String sessionId;
     private String sessionName;
     private String sessionDescription;
     private Integer numberOfQuestions;
+    private String isTimed;
+    private Long lengthOfTime;
 }

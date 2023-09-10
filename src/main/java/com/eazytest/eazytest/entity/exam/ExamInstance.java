@@ -2,8 +2,8 @@ package com.eazytest.eazytest.entity.exam;
 
 import com.eazytest.eazytest.dto.Exam.CategoryType;
 import com.eazytest.eazytest.dto.Exam.TimeType;
-import com.eazytest.eazytest.entity.user.Examiner;
-import com.eazytest.eazytest.entity.user.Participant;
+import com.eazytest.eazytest.entity.userType.ExaminerType;
+import com.eazytest.eazytest.entity.userType.ParticipantType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,14 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "enrolled_course")
-public class ExamSession {
+public class ExamInstance {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String sessionId;
+
     @ManyToOne
     @JoinColumn(name = "examiner_id")
-    private Examiner examiner;
+    private ExaminerType examinerClass;
     private String sessionName;
     private String sessionDescription;
     private CategoryType category;
@@ -38,7 +38,7 @@ public class ExamSession {
             joinColumns = @JoinColumn(name = "examSessionId"),
             inverseJoinColumns = @JoinColumn(name = "participantId")
     )
-    private List<Participant> participant;
+    private List<ParticipantType> participantType;
     @CreationTimestamp
     private LocalDateTime sessionCreatedDate;
 }
