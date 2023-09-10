@@ -7,7 +7,7 @@ import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
 import com.eazytest.eazytest.entity.userType.RoleEnum;
 import com.eazytest.eazytest.entity.userType.UserType;
-import com.eazytest.eazytest.entity.security.TokenEntity;
+import com.eazytest.eazytest.entity.security.Token;
 import com.eazytest.eazytest.entity.security.TokenType;
 import com.eazytest.eazytest.repository.User.UserRepository;
 import com.eazytest.eazytest.repository.security.TokenRepository;
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthServiceInterface {
         String token = jwtService.generateToken(authentication.getName());
 
         revokeValidTokens(user);
-        TokenEntity tokenEntity = TokenEntity.builder()
+        Token tokenEntity = Token.builder()
                 .userType(user)
                 .token(token)
                 .tokenType(TokenType.BEARER)
@@ -100,13 +100,13 @@ public class AuthServiceImpl implements AuthServiceInterface {
     }
 
     private void revokeValidTokens(UserType user) {
-        List<TokenEntity> tokenEntityList = tokenRepository.findAllValidTokensByUser(user.getId());
-        if (tokenEntityList.isEmpty())
+        List<Token> tokenList = tokenRepository.findAllValidTokensByUser(user.getId());
+        if (tokenList.isEmpty())
             return;
-        tokenEntityList.forEach(t -> {
+        tokenList.forEach(t -> {
             t.setRevoked(true);
             t.setExpired(true);
         });
-        tokenRepository.saveAll(tokenEntityList);
+        tokenRepository.saveAll(tokenList);
     }
 }

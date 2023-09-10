@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @Builder
 @Entity
-public class TokenEntity {
+public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +20,6 @@ public class TokenEntity {
     private Boolean expired;
     private Boolean revoked;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private UserType userType;
 }

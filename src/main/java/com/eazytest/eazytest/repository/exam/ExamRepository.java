@@ -7,10 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ExamRepository extends JpaRepository<ExamInstance, String> {
-    @Query("select e from ExamSession e where e.examiner.examinerId = ?1")
+    @Query("select e from ExamInstance e where e.examinerClass.examinerId = ?1")
     List<ExamInstance> findByExaminerId(String examinerId);
 
-//    List<ExamSession> findByExaminerId(String examinerId);
-
+//    @Query("select e from ExamSession e where e.examiner.examinerId = ?1")
+//    List<ExamInstance> findByExaminerId(String examinerId);
 
 }

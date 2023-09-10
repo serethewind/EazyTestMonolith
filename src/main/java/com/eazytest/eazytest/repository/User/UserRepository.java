@@ -18,6 +18,6 @@ public interface UserRepository extends JpaRepository<UserType, Long> {
 
     Optional<UserType> findByUsername(String username);
 
-    @Query("select u from UserEntity u where u.username = ?1 or u.email = ?2")
+//    @Query("select u from UserEntity u where u.username = ?1 or u.email = ?2")
     Optional<UserType> findByUsernameOrEmail(String username, String email);
 }

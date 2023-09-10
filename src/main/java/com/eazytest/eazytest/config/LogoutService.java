@@ -1,7 +1,7 @@
 package com.eazytest.eazytest.config;
 
 
-import com.eazytest.eazytest.entity.security.TokenEntity;
+import com.eazytest.eazytest.entity.security.Token;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.security.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class LogoutService implements LogoutHandler {
             return;
         }
         String jwt = authHeader.substring(7);
-        TokenEntity token = tokenRepository.findByToken(jwt).orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+        Token token = tokenRepository.findByToken(jwt).orElseThrow(() -> new ResourceNotFoundException("Token not found"));
         if (token != null){
             token.setExpired(true);
             token.setRevoked(true);
