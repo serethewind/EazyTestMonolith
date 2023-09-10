@@ -37,9 +37,11 @@ public class ExamService implements ExamServiceInterface {
                 .lengthOfTimeInMinutes((examRequestDto.getIsTimed().equals(String.valueOf(TimeType.DISABLED))) ? Long.MAX_VALUE : examRequestDto.getLengthOfTime())
                 .build();
 
+        examRepository.save(examInstance);
+
         examinerType.getExamInstances().add(examInstance);
         examinerRepository.save(examinerType);
-        examRepository.save(examInstance);
+
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: %s created successfully", examInstance.getSessionId()))
