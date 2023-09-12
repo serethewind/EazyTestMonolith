@@ -141,7 +141,7 @@ public class QuestionService implements QuestionServiceInterface {
     public ReadQuestionResponseDto findQuestionBySearchQuery(String searchWord, int pageNo, int pageSize) {
         Page<QuestionInstance> questionInstances = convertListToPage(pageNo, pageSize);
 
-        Page<QuestionInstance> filteredQuestionInstances = questionInstances.stream().filter(questionInstance -> questionInstance.getTitle().contains(searchWord)).collect(Collectors.collectingAndThen(Collectors.toList(), questionInstanceList -> new PageImpl<>(questionInstanceList, PageRequest.of(pageNo, pageSize), questionInstanceList.size())));
+        Page<QuestionInstance> filteredQuestionInstances = questionInstances.stream().filter(questionInstance -> questionInstance.getTitle().toLowerCase().contains(searchWord.toLowerCase())).collect(Collectors.collectingAndThen(Collectors.toList(), questionInstanceList -> new PageImpl<>(questionInstanceList, PageRequest.of(pageNo, pageSize), questionInstanceList.size())));
 
         if (filteredQuestionInstances.isEmpty()) {
             throw new QuestionResourceNotFoundException("The search word used does not match and question title in the repository");
