@@ -1,11 +1,11 @@
 package com.eazytest.eazytest.service.user.userInfo;
 
-import com.eazytest.eazytest.dto.User.UserInfoUpdateDto;
+import com.eazytest.eazytest.dto.user.UserInfoUpdateDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
 import com.eazytest.eazytest.entity.userType.UserType;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
-import com.eazytest.eazytest.repository.User.UserRepository;
+import com.eazytest.eazytest.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

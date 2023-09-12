@@ -1,7 +1,7 @@
 package com.eazytest.eazytest.service.user.auth;
 
-import com.eazytest.eazytest.dto.User.UserLoginDto;
-import com.eazytest.eazytest.dto.User.UserRegisterDto;
+import com.eazytest.eazytest.dto.user.UserLoginDto;
+import com.eazytest.eazytest.dto.user.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import org.springframework.http.ResponseEntity;
 

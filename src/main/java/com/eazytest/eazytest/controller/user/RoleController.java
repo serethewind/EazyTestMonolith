@@ -1,4 +1,4 @@
-package com.eazytest.eazytest.controller.User;
+package com.eazytest.eazytest.controller.user;
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.service.user.role.RoleServiceInteface;
