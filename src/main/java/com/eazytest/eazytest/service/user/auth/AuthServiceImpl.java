@@ -1,15 +1,15 @@
 package com.eazytest.eazytest.service.user.auth;
 
 import com.eazytest.eazytest.config.JWTService;
-import com.eazytest.eazytest.dto.User.UserLoginDto;
-import com.eazytest.eazytest.dto.User.UserRegisterDto;
+import com.eazytest.eazytest.dto.user.UserLoginDto;
+import com.eazytest.eazytest.dto.user.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
 import com.eazytest.eazytest.entity.userType.RoleEnum;
 import com.eazytest.eazytest.entity.userType.UserType;
 import com.eazytest.eazytest.entity.security.Token;
 import com.eazytest.eazytest.entity.security.TokenType;
-import com.eazytest.eazytest.repository.User.UserRepository;
+import com.eazytest.eazytest.repository.user.UserRepository;
 import com.eazytest.eazytest.repository.security.TokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

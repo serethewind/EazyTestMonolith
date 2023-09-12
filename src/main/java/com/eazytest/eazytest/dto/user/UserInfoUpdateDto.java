@@ -1,7 +1,5 @@
-package com.eazytest.eazytest.dto.User;
+package com.eazytest.eazytest.dto.user;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

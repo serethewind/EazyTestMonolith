@@ -1,9 +1,8 @@
 package com.eazytest.eazytest.service.exam.examsession;
-import com.eazytest.eazytest.dto.Exam.ActivateSessionDto;
-import com.eazytest.eazytest.dto.Exam.ExamRequestDto;
-import com.eazytest.eazytest.dto.Exam.ExamUpdateRequestDto;
+import com.eazytest.eazytest.dto.exam.ActivateSessionDto;
+import com.eazytest.eazytest.dto.exam.ExamRequestDto;
+import com.eazytest.eazytest.dto.exam.ExamUpdateRequestDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
-import com.eazytest.eazytest.dto.general.ResponseDto;
 
 import java.util.List;
 

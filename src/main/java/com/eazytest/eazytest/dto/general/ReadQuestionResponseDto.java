@@ -1,6 +1,6 @@
 package com.eazytest.eazytest.dto.general;
 
-import com.eazytest.eazytest.dto.exam.ExamResponseDto;
+import com.eazytest.eazytest.dto.question.PageableResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,12 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
-public class ReadResponseDto {
-
+public class ReadQuestionResponseDto {
     private String message;
-    private List<ExamResponseDto> examResponseDtoList;
+    private List<Object> suitableObjectResponseDto;
 }

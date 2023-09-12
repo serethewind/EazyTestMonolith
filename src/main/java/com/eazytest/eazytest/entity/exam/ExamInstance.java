@@ -1,7 +1,7 @@
 package com.eazytest.eazytest.entity.exam;
 
-import com.eazytest.eazytest.dto.Exam.CategoryType;
-import com.eazytest.eazytest.dto.Exam.TimeType;
+import com.eazytest.eazytest.dto.exam.CategoryType;
+import com.eazytest.eazytest.dto.exam.TimeType;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
 import com.eazytest.eazytest.entity.userType.ParticipantType;
 import jakarta.persistence.*;
@@ -27,9 +27,11 @@ public class ExamInstance {
     private ExaminerType examinerClass;
     private String sessionName;
     private String sessionDescription;
+
     private CategoryType category;
     private Integer numberOfQuestions;
     private Boolean isExamActive;
+
     private TimeType isTimed;
     private Long lengthOfTimeInMinutes;
     private List<Long> questionsList;

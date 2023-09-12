@@ -1,17 +1,16 @@
 package com.eazytest.eazytest.service.exam.examsession;
 
-import com.eazytest.eazytest.dto.Exam.*;
+import com.eazytest.eazytest.dto.exam.*;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.entity.exam.ExamInstance;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
 import com.eazytest.eazytest.exception.BadRequestException;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
-import com.eazytest.eazytest.repository.User.ExaminerRepository;
+import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

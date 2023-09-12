@@ -2,7 +2,7 @@ package com.eazytest.eazytest.config;
 
 
 import com.eazytest.eazytest.entity.userType.UserType;
-import com.eazytest.eazytest.repository.User.UserRepository;
+import com.eazytest.eazytest.repository.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

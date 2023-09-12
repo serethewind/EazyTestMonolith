@@ -1,20 +1,19 @@
-package com.eazytest.eazytest.dto.Exam;
+package com.eazytest.eazytest.dto.exam;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Builder
-public class ExamResponseDto {
-
+@Data
+public class ExamUpdateRequestDto {
+    private String examinerId;
     private String sessionName;
     private String sessionDescription;
-    private String examinerId;
-
+    private Integer numberOfQuestions;
+    private String isTimed;
+    private Long lengthOfTime;
 }

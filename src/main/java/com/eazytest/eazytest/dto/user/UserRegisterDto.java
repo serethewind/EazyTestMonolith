@@ -1,4 +1,4 @@
-package com.eazytest.eazytest.dto.User;
+package com.eazytest.eazytest.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

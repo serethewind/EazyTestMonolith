@@ -1,4 +1,4 @@
-package com.eazytest.eazytest.dto.Exam;
+package com.eazytest.eazytest.dto.exam;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,13 +7,12 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Data
-public class ExamUpdateRequestDto {
-    private String examinerId;
+@Builder
+public class ExamResponseDto {
+    private String sessionId;
     private String sessionName;
     private String sessionDescription;
-    private Integer numberOfQuestions;
-    private String isTimed;
-    private Long lengthOfTime;
+    private String examinerId;
+
 }
