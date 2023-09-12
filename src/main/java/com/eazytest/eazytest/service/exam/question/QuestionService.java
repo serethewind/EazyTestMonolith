@@ -7,6 +7,7 @@ import com.eazytest.eazytest.dto.question.PageableResponseDto;
 import com.eazytest.eazytest.dto.question.QuestionRequestDto;
 import com.eazytest.eazytest.dto.question.QuestionResponseDto;
 import com.eazytest.eazytest.entity.exam.QuestionInstance;
+import com.eazytest.eazytest.exception.BadRequestException;
 import com.eazytest.eazytest.exception.QuestionResourceNotFoundException;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.exam.QuestionRepository;
@@ -175,10 +176,27 @@ public class QuestionService implements QuestionServiceInterface {
     public ReadQuestionResponseDto deleteQuestionById(Long questionId) {
         QuestionInstance questionInstance = questionRepository.findById(questionId).orElseThrow(() -> new QuestionResourceNotFoundException(String.format("Question with id: '%d' not found", questionId)));
 
+        if (!questionInstance.isAvailable()){
+            throw new BadRequestException(String.format("Question with id: '%d' is already unavailable to participants", questionId));
+        }
+
         questionInstance.setAvailable(false);
         questionRepository.save(questionInstance);
 
         return mapToReadQuestionResponseDto(String.format("Question with id: '%d' is now unavailable and removed from the questions presented to participants", questionId), questionInstance);
+    }
+
+    @Override
+    public ReadQuestionResponseDto reactivateQuestionById(Long questionId) {
+       QuestionInstance questionInstance = questionRepository.findById(questionId).orElseThrow(() -> new QuestionResourceNotFoundException(String.format("Question with id: '%d' not found", questionId)));
+
+       if (questionInstance.isAvailable()) {
+           throw new BadRequestException(String.format("Question with id: '%d' is already available to participants", questionId));
+       }
+       questionInstance.setAvailable(true);
+       questionRepository.save(questionInstance);
+
+        return mapToReadQuestionResponseDto(String.format("Question with id: '%d' is now available and added to the questions presented to participants", questionId), questionInstance);
     }
 
     private Page<QuestionInstance> convertListToPage(int pageNo, int pageSize) {

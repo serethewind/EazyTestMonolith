@@ -21,4 +21,6 @@ public interface QuestionServiceInterface {
     ReadQuestionResponseDto updateQuestionInstance(Long questionId, QuestionRequestDto questionRequestDto);
 
     ReadQuestionResponseDto deleteQuestionById(Long questionId);
+
+    ReadQuestionResponseDto reactivateQuestionById(Long questionId);
 }
