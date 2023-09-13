@@ -1,14 +1,21 @@
 package com.eazytest.eazytest.service.exam.examsession;
 
 import com.eazytest.eazytest.dto.exam.*;
+import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
+import com.eazytest.eazytest.dto.question.PageableResponseDto;
+import com.eazytest.eazytest.dto.question.QuestionResponseDto;
 import com.eazytest.eazytest.entity.exam.ExamInstance;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
 import com.eazytest.eazytest.exception.BadRequestException;
+import com.eazytest.eazytest.exception.ExamResourceNotFoundException;
+import com.eazytest.eazytest.exception.FailedRequestException;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
+import com.eazytest.eazytest.service.exam.question.QuestionServiceInterface;
 import lombok.AllArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -20,6 +27,7 @@ import java.util.stream.Collectors;
 public class ExamService implements ExamServiceInterface {
     private ExamRepository examRepository;
     private ExaminerRepository examinerRepository;
+    private QuestionServiceInterface questionService;
 
     @Override
     public ReadResponseDto createExamSession(ExamRequestDto examRequestDto) {
@@ -258,7 +266,7 @@ public class ExamService implements ExamServiceInterface {
             throw new BadRequestException("Examiner id doesn't match for all the exam sessions in the batch");
         }
 
-     List<ExamInstance> examInstanceList =  examRequestDtoList.stream().map(examRequestDto -> examRepository.save(
+        List<ExamInstance> examInstanceList = examRequestDtoList.stream().map(examRequestDto -> examRepository.save(
                 ExamInstance.builder()
                         .examinerClass(examinerType)
                         .sessionName(examRequestDto.getSessionName())
@@ -279,6 +287,34 @@ public class ExamService implements ExamServiceInterface {
                         .sessionDescription(examInstance.getSessionDescription())
                         .examinerId(examinerId)
                         .build()).collect(Collectors.toList()))
+                .build();
+    }
+
+    @Override
+    public SessionWithGeneratedQuestionsDto generateQuestionsForExamSession(String sessionId, int pageNo, int pageSize) {
+        ExamInstance examInstance = examRepository.findById(sessionId).orElseThrow(() -> new ExamResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
+
+        ReadQuestionResponseDto readQuestionResponseDto = questionService.generateQuestionsForExamSession(pageNo, pageSize, examInstance.getNumberOfQuestions(), examInstance.getCategory().toString());
+
+        if (readQuestionResponseDto.getSuitableObjectResponseDto().isEmpty()) {
+            throw new FailedRequestException("Question service failed to respond. Try again later");
+        }
+
+        PageableResponseDto pageableResponseDto = (PageableResponseDto) readQuestionResponseDto.getSuitableObjectResponseDto().iterator().next();
+
+        List<Long> questionId = pageableResponseDto.getQuestionResponseDtoList().stream().map(QuestionResponseDto::getId).toList();
+
+        examInstance.setQuestionsList(questionId);
+        examRepository.save(examInstance);
+
+        return SessionWithGeneratedQuestionsDto.builder()
+                .sessionId(examInstance.getSessionId())
+                .sessionName(examInstance.getSessionName())
+                .sessionDescription(examInstance.getSessionDescription())
+                .sessionTime(
+                        (examInstance.getIsTimed() == TimeType.ENABLED) ? String.format("The session is timed and will span '%d' minutes", examInstance.getLengthOfTimeInMinutes()) : "This session is not timed.")
+                .sessionCategory(String.format("This session is for '%s'", examInstance.getCategory().toString()))
+                .pageableResponseDto((PageableResponseDto) readQuestionResponseDto.getSuitableObjectResponseDto().iterator().next())
                 .build();
     }
 }

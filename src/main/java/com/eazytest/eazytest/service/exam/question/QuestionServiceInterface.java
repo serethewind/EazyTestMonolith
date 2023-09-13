@@ -23,4 +23,5 @@ public interface QuestionServiceInterface {
     ReadQuestionResponseDto deleteQuestionById(Long questionId);
 
     ReadQuestionResponseDto reactivateQuestionById(Long questionId);
+    ReadQuestionResponseDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category);
 }

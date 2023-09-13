@@ -9,21 +9,22 @@ import com.eazytest.eazytest.dto.question.QuestionResponseDto;
 import com.eazytest.eazytest.entity.exam.QuestionInstance;
 import com.eazytest.eazytest.exception.BadRequestException;
 import com.eazytest.eazytest.exception.QuestionResourceNotFoundException;
-import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.exam.QuestionRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class QuestionService implements QuestionServiceInterface {
 
     private QuestionRepository questionRepository;
@@ -79,36 +80,19 @@ public class QuestionService implements QuestionServiceInterface {
     @Override
     public ReadQuestionResponseDto fetchAllQuestions(int pageNo, int pageSize) {
 
-        Page<QuestionInstance> questionInstances = convertListToPage(pageNo, pageSize);
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        Page<QuestionInstance> questionInstances = questionRepository.findAll(pageable);
+
+        if (questionInstances.isEmpty()) {
+            throw new QuestionResourceNotFoundException("Question list is empty");
+        }
 
         List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(questionInstances);
 
         String message = "Question list successfully returned according to page specifications";
 
         return mapToReadQuestionResponseDto(message, questionInstances, questionResponseDtoList);
-
-//        List<QuestionInstance> questionInstanceList = questionInstances.getContent();
-//
-//        List<QuestionResponseDto> questionResponseDtoList = questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
-//                .id(questionInstance.getId())
-//                .title(questionInstance.getTitle())
-//                .option1(questionInstance.getOption1())
-//                .option2(questionInstance.getOption2())
-//                .option3(questionInstance.getOption3())
-//                .option4(questionInstance.getOption4())
-//                .build()).toList();
-
-//        return ReadQuestionResponseDto.builder()
-//                .message("Question list successfully returned according to page specifications")
-//                .suitableObjectResponseDto(Collections.singletonList(PageableResponseDto.builder()
-//                        .questionResponseDtoList(questionResponseDtoList)
-//                        .pageNo(questionInstances.getNumber())
-//                        .pageSize(questionInstances.getSize())
-//                        .totalElements(questionInstances.getTotalElements())
-//                        .totalPages(questionInstances.getTotalPages())
-//                        .last(questionInstances.isLast())
-//                        .build()))
-//                .build();
     }
 
     @Override
@@ -121,32 +105,28 @@ public class QuestionService implements QuestionServiceInterface {
     @Override
     public ReadQuestionResponseDto findQuestionsByCategory(String category, int pageNo, int pageSize) {
 
+        List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).toList();
 
-        Page<QuestionInstance> questionInstances = convertListToPage(pageNo, pageSize);
-
-        Page<QuestionInstance> filteredQuestions = questionInstances.stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equals(category)).collect(Collectors.collectingAndThen(
-                Collectors.toList(),
-                questionInstanceList -> new PageImpl<>(questionInstanceList, PageRequest.of(pageNo, pageSize), questionInstanceList.size())
-        ));
-
-        if (filteredQuestions.isEmpty()) {
-            throw new QuestionResourceNotFoundException("No question with the requested category found");
+        if (questionInstances.isEmpty()) {
+            throw new QuestionResourceNotFoundException("No question in the category requested for");
         }
 
-        List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(filteredQuestions);
+        Page<QuestionInstance> filteredQuestionInstance = convertListToPage(pageNo, pageSize, questionInstances);
 
-        return mapToReadQuestionResponseDto(String.format("Questions under the requested category: '%s' successfully fetched", category), filteredQuestions, questionResponseDtoList);
+        List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(filteredQuestionInstance);
+
+        return mapToReadQuestionResponseDto(String.format("Questions under the requested category: '%s' successfully fetched", category), filteredQuestionInstance, questionResponseDtoList);
     }
 
     @Override
     public ReadQuestionResponseDto findQuestionBySearchQuery(String searchWord, int pageNo, int pageSize) {
-        Page<QuestionInstance> questionInstances = convertListToPage(pageNo, pageSize);
+        List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getTitle().toLowerCase().contains(searchWord.toLowerCase())).toList();
 
-        Page<QuestionInstance> filteredQuestionInstances = questionInstances.stream().filter(questionInstance -> questionInstance.getTitle().toLowerCase().contains(searchWord.toLowerCase())).collect(Collectors.collectingAndThen(Collectors.toList(), questionInstanceList -> new PageImpl<>(questionInstanceList, PageRequest.of(pageNo, pageSize), questionInstanceList.size())));
-
-        if (filteredQuestionInstances.isEmpty()) {
+        if (questionInstances.isEmpty()) {
             throw new QuestionResourceNotFoundException("The search word used does not match and question title in the repository");
         }
+
+        Page<QuestionInstance> filteredQuestionInstances = convertListToPage(pageNo, pageSize, questionInstances);
 
         List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(filteredQuestionInstances);
 
@@ -169,14 +149,13 @@ public class QuestionService implements QuestionServiceInterface {
         questionRepository.save(questionInstance);
 
         return mapToReadQuestionResponseDto(String.format("Question with id: '%d' successfully updated", questionId), questionInstance);
-
     }
 
     @Override
     public ReadQuestionResponseDto deleteQuestionById(Long questionId) {
         QuestionInstance questionInstance = questionRepository.findById(questionId).orElseThrow(() -> new QuestionResourceNotFoundException(String.format("Question with id: '%d' not found", questionId)));
 
-        if (!questionInstance.isAvailable()){
+        if (!questionInstance.isAvailable()) {
             throw new BadRequestException(String.format("Question with id: '%d' is already unavailable to participants", questionId));
         }
 
@@ -188,28 +167,45 @@ public class QuestionService implements QuestionServiceInterface {
 
     @Override
     public ReadQuestionResponseDto reactivateQuestionById(Long questionId) {
-       QuestionInstance questionInstance = questionRepository.findById(questionId).orElseThrow(() -> new QuestionResourceNotFoundException(String.format("Question with id: '%d' not found", questionId)));
+        QuestionInstance questionInstance = questionRepository.findById(questionId).orElseThrow(() -> new QuestionResourceNotFoundException(String.format("Question with id: '%d' not found", questionId)));
 
-       if (questionInstance.isAvailable()) {
-           throw new BadRequestException(String.format("Question with id: '%d' is already available to participants", questionId));
-       }
-       questionInstance.setAvailable(true);
-       questionRepository.save(questionInstance);
+        if (questionInstance.isAvailable()) {
+            throw new BadRequestException(String.format("Question with id: '%d' is already available to participants", questionId));
+        }
+        questionInstance.setAvailable(true);
+        questionRepository.save(questionInstance);
 
         return mapToReadQuestionResponseDto(String.format("Question with id: '%d' is now available and added to the questions presented to participants", questionId), questionInstance);
     }
 
-    private Page<QuestionInstance> convertListToPage(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+    @Override
+    public ReadQuestionResponseDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category) {
 
-        Page<QuestionInstance> questionInstances = questionRepository.findAll(pageable);
-
+        List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).collect(Collectors.toList());
 
         if (questionInstances.isEmpty()) {
-            throw new QuestionResourceNotFoundException("Question list is empty");
+            throw new QuestionResourceNotFoundException("Question with category requested for is empty");
         }
 
-        return questionInstances;
+        Collections.shuffle(questionInstances);
+       questionInstances = questionInstances.subList(0, numberOfQuestions - 1);
+
+        Page<QuestionInstance> filteredQuestionInstances = convertListToPage(pageNo, pageSize, questionInstances);
+
+        List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(filteredQuestionInstances);
+
+        log.info(String.format("the number of questions is '%d'", numberOfQuestions));
+
+        return mapToReadQuestionResponseDto("Questions successfully generated for exam session based on category and number of questions parameter", filteredQuestionInstances, questionResponseDtoList);
+    }
+
+    private Page<QuestionInstance> convertListToPage(int pageNo, int pageSize, List<QuestionInstance> questionInstances) {
+        PagedListHolder<QuestionInstance> questionInstancePagedListHolder = new PagedListHolder<>(questionInstances);
+
+        questionInstancePagedListHolder.setPage(pageNo);
+        questionInstancePagedListHolder.setPageSize(pageSize);
+
+        return new PageImpl<>(questionInstancePagedListHolder.getPageList(), PageRequest.of(pageNo, pageSize), questionInstances.size());
     }
 
     private List<QuestionResponseDto> mapToQuestionResponseDto(Page<QuestionInstance> questionInstances) {
@@ -242,12 +238,12 @@ public class QuestionService implements QuestionServiceInterface {
         return ReadQuestionResponseDto.builder()
                 .message(message)
                 .suitableObjectResponseDto(Collections.singletonList(QuestionResponseDto.builder()
-                                .id(questionInstance.getId())
-                                .title(questionInstance.getTitle())
-                                .option1(questionInstance.getOption1())
-                                .option2(questionInstance.getOption2())
-                                .option3(questionInstance.getOption3())
-                                .option4(questionInstance.getOption4())
+                        .id(questionInstance.getId())
+                        .title(questionInstance.getTitle())
+                        .option1(questionInstance.getOption1())
+                        .option2(questionInstance.getOption2())
+                        .option3(questionInstance.getOption3())
+                        .option4(questionInstance.getOption4())
                         .build()))
                 .build();
     }
