@@ -1,20 +1,29 @@
 package com.eazytest.eazytest.service.exam.examsession;
 
 import com.eazytest.eazytest.dto.exam.*;
+import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.question.PageableResponseDto;
 import com.eazytest.eazytest.dto.question.QuestionResponseDto;
 import com.eazytest.eazytest.entity.exam.ExamInstance;
+import com.eazytest.eazytest.entity.exam.QuestionInstance;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
+import com.eazytest.eazytest.entity.userType.ParticipantType;
 import com.eazytest.eazytest.exception.BadRequestException;
 import com.eazytest.eazytest.exception.ExamResourceNotFoundException;
 import com.eazytest.eazytest.exception.FailedRequestException;
 import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
+import com.eazytest.eazytest.repository.user.ParticipantRepository;
 import com.eazytest.eazytest.service.exam.question.QuestionServiceInterface;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -23,10 +32,12 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ExamService implements ExamServiceInterface {
     private ExamRepository examRepository;
     private ExaminerRepository examinerRepository;
     private QuestionServiceInterface questionService;
+    private ParticipantRepository participantRepository;
 
     @Override
     public ReadResponseDto createExamSession(ExamRequestDto examRequestDto) {
@@ -293,15 +304,16 @@ public class ExamService implements ExamServiceInterface {
     public SessionWithGeneratedQuestionsDto generateQuestionsForExamSession(String sessionId, int pageNo, int pageSize) {
         ExamInstance examInstance = examRepository.findById(sessionId).orElseThrow(() -> new ExamResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
 
-        ReadQuestionResponseDto readQuestionResponseDto = questionService.generateQuestionsForExamSession(pageNo, pageSize, examInstance.getNumberOfQuestions(), examInstance.getCategory().toString());
+        PageableResponseDto pageableResponseDto = questionService.generateQuestionsForExamSession(pageNo, pageSize, examInstance.getNumberOfQuestions(), examInstance.getCategory().toString()).getPageableResponseDtoList().iterator().next();
 
-        if (readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().isEmpty()) {
+        List<QuestionResponseDto> questionResponseDtoList = pageableResponseDto.getQuestionResponseDtoList();
+
+        if (questionResponseDtoList.isEmpty()) {
             throw new FailedRequestException("Question service failed to respond. Try again later");
         }
 
-        PageableResponseDto pageableResponseDto = (PageableResponseDto) readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().iterator().next();
-
-        List<Long> questionId = pageableResponseDto.getQuestionResponseDtoList().stream().map(QuestionResponseDto::getId).toList();
+        List<Long> questionId = questionResponseDtoList.stream().map(QuestionResponseDto::getId).collect(Collectors.toList());
+        log.info(String.format("the list of question just discovered is '%d'", questionId.size()));
 
         examInstance.setQuestionsList(questionId);
         examRepository.save(examInstance);
@@ -313,29 +325,57 @@ public class ExamService implements ExamServiceInterface {
                 .sessionTime(
                         (examInstance.getIsTimed() == TimeType.ENABLED) ? String.format("The session is timed and will span '%d' minutes", examInstance.getLengthOfTimeInMinutes()) : "This session is not timed.")
                 .sessionCategory(String.format("This session is for '%s'", examInstance.getCategory().toString()))
-                .pageableResponseDto((PageableResponseDto) readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().iterator().next())
+                .pageableResponseDto(pageableResponseDto)
                 .build();
     }
 
     @Override
     public SessionWithGeneratedQuestionsDto viewExamSessionForParticipant(TakeExamSessionDto takeExamSessionDto, int pageNo, int pageSize) {
-        return null;
+
+        ExamInstance examInstance = examRepository.findById(takeExamSessionDto.getSessionId()).orElseThrow(() -> new ExamResourceNotFoundException(String.format("Exam session with id: '%s' not found", takeExamSessionDto.getSessionId())));
+
+        ParticipantType participantTypeTakingExaminationSession = participantRepository.findById(takeExamSessionDto.getParticipantId()).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: '%s' not found", takeExamSessionDto.getParticipantId())));
+
+        if (!examInstance.getIsExamActive() || examInstance.getQuestionsList().isEmpty()) {
+            throw new FailedRequestException("Exam requested is not available for participants to take");
+        }
+
+        log.info(String.format("the question list before is '%d'", examInstance.getQuestionsList().size()));
+        PageableResponseDto pageableResponseDtoList = questionService.findBatchOfQuestionsByListOfId(examInstance.getQuestionsList(), pageNo, pageSize).getPageableResponseDtoList().iterator().next();
+        log.info(String.format("the question list after is '%d'", examInstance.getQuestionsList().size()));
+        boolean hasTakenExamBefore = examInstance.getParticipantType().stream().anyMatch(participantType -> participantType.getParticipantId().equalsIgnoreCase(takeExamSessionDto.getParticipantId()));
+
+        if (!hasTakenExamBefore) {
+            examInstance.getParticipantType().add(participantTypeTakingExaminationSession);
+            examRepository.save(examInstance);
+        }
+
+        return SessionWithGeneratedQuestionsDto.builder()
+                .sessionId(examInstance.getSessionId())
+                .sessionName(examInstance.getSessionName())
+                .sessionDescription(examInstance.getSessionDescription())
+                .sessionTime(
+                        (examInstance.getIsTimed() == TimeType.ENABLED) ? String.format("The session is timed and will span '%d' minutes", examInstance.getLengthOfTimeInMinutes()) : "This session is not timed.")
+                .sessionCategory(String.format("This session is for '%s'", examInstance.getCategory().toString()))
+                .sessionMessage("Do well to read the instructions. This exam can only be taken once. Good luck!")
+                .pageableResponseDto(pageableResponseDtoList)
+                .build();
     }
 
     @Override
     public ReadResponseDto fetchActiveExamSessions() {
         List<ExamInstance> examInstanceList = examRepository.findAll().stream().filter(ExamInstance::getIsExamActive).toList();
 
-        if (examInstanceList.isEmpty()){
+        if (examInstanceList.isEmpty()) {
             throw new ExamResourceNotFoundException("No session is currently active");
         }
 
-      List<ExamResponseDto> examResponseDtoList = examInstanceList.stream().map(examInstance -> ExamResponseDto.builder()
+        List<ExamResponseDto> examResponseDtoList = examInstanceList.stream().map(examInstance -> ExamResponseDto.builder()
                 .sessionId(examInstance.getSessionId())
                 .sessionName(examInstance.getSessionName())
                 .sessionDescription(examInstance.getSessionDescription())
                 .examinerId(examInstance.getExaminerClass().getExaminerId())
-                .build()).toList();;
+                .build()).toList();
 
         return ReadResponseDto.builder()
                 .message("The below exam session are currently active: ")

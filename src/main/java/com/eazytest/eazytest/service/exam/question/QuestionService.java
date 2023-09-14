@@ -1,6 +1,7 @@
 package com.eazytest.eazytest.service.exam.question;
 
 import com.eazytest.eazytest.dto.exam.CategoryType;
+import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.question.Difficulty;
 import com.eazytest.eazytest.dto.question.PageableResponseDto;
@@ -64,7 +65,7 @@ public class QuestionService implements QuestionServiceInterface {
 
         return ReadQuestionResponseDto.builder()
                 .message("Batch of questions successfully created")
-                .suitableUserResponseDtoResponseDto(questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
+                .questionResponseDtoList(questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
                         .id(questionInstance.getId())
                         .title(questionInstance.getTitle())
                         .option1(questionInstance.getOption1())
@@ -76,7 +77,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto fetchAllQuestions(int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto fetchAllQuestions(int pageNo, int pageSize) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
@@ -101,7 +102,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto findQuestionsByCategory(String category, int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto findQuestionsByCategory(String category, int pageNo, int pageSize) {
 
         List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).toList();
 
@@ -117,7 +118,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto findQuestionBySearchQuery(String searchWord, int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto findQuestionBySearchQuery(String searchWord, int pageNo, int pageSize) {
         List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getTitle().toLowerCase().contains(searchWord.toLowerCase())).toList();
 
         if (questionInstances.isEmpty()) {
@@ -177,7 +178,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category) {
+    public ReadQuestionResponseAlternativeDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category) {
 
         List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).collect(Collectors.toList());
 
@@ -186,7 +187,7 @@ public class QuestionService implements QuestionServiceInterface {
         }
 
         Collections.shuffle(questionInstances);
-       questionInstances = questionInstances.subList(0, numberOfQuestions - 1);
+       questionInstances = questionInstances.subList(0, numberOfQuestions);
 
         Page<QuestionInstance> filteredQuestionInstances = convertListToPage(pageNo, pageSize, questionInstances);
 
@@ -198,7 +199,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize) {
       List<QuestionInstance> questionInstances = questionId.stream().map(id -> questionRepository.findById(id).orElseThrow(() -> new QuestionResourceNotFoundException("Question resource not found"))).toList();
 
       Page<QuestionInstance> questionInstancePage = convertListToPage(pageNo, pageSize, questionInstances);
@@ -228,10 +229,10 @@ public class QuestionService implements QuestionServiceInterface {
                 .build()).collect(Collectors.toList());
     }
 
-    private ReadQuestionResponseDto mapToReadQuestionResponseDto(String message, Page<QuestionInstance> questionInstances, List<QuestionResponseDto> questionResponseDtoList) {
-        return ReadQuestionResponseDto.builder()
+    private ReadQuestionResponseAlternativeDto mapToReadQuestionResponseDto(String message, Page<QuestionInstance> questionInstances, List<QuestionResponseDto> questionResponseDtoList) {
+        return ReadQuestionResponseAlternativeDto.builder()
                 .message(message)
-                .suitableUserResponseDtoResponseDto(Collections.singletonList(PageableResponseDto.builder()
+                .pageableResponseDtoList(Collections.singletonList(PageableResponseDto.builder()
                         .questionResponseDtoList(questionResponseDtoList)
                         .pageNo(questionInstances.getNumber())
                         .pageSize(questionInstances.getSize())
@@ -246,7 +247,7 @@ public class QuestionService implements QuestionServiceInterface {
 
         return ReadQuestionResponseDto.builder()
                 .message(message)
-                .suitableUserResponseDtoResponseDto(Collections.singletonList(QuestionResponseDto.builder()
+                .questionResponseDtoList(Collections.singletonList(QuestionResponseDto.builder()
                         .id(questionInstance.getId())
                         .title(questionInstance.getTitle())
                         .option1(questionInstance.getOption1())
