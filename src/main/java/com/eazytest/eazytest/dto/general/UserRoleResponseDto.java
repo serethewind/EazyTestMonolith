@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Builder
-public class ReadQuestionResponseDto {
-    private String message;
-    private List<Object> suitableUserResponseDtoResponseDto;
+public class UserRoleResponseDto {
+    private String userId;
+    private String userName;
 }

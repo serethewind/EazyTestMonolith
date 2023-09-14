@@ -15,7 +15,6 @@ import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
 import com.eazytest.eazytest.service.exam.question.QuestionServiceInterface;
 import lombok.AllArgsConstructor;
-import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -296,11 +295,11 @@ public class ExamService implements ExamServiceInterface {
 
         ReadQuestionResponseDto readQuestionResponseDto = questionService.generateQuestionsForExamSession(pageNo, pageSize, examInstance.getNumberOfQuestions(), examInstance.getCategory().toString());
 
-        if (readQuestionResponseDto.getSuitableObjectResponseDto().isEmpty()) {
+        if (readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().isEmpty()) {
             throw new FailedRequestException("Question service failed to respond. Try again later");
         }
 
-        PageableResponseDto pageableResponseDto = (PageableResponseDto) readQuestionResponseDto.getSuitableObjectResponseDto().iterator().next();
+        PageableResponseDto pageableResponseDto = (PageableResponseDto) readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().iterator().next();
 
         List<Long> questionId = pageableResponseDto.getQuestionResponseDtoList().stream().map(QuestionResponseDto::getId).toList();
 
@@ -314,7 +313,7 @@ public class ExamService implements ExamServiceInterface {
                 .sessionTime(
                         (examInstance.getIsTimed() == TimeType.ENABLED) ? String.format("The session is timed and will span '%d' minutes", examInstance.getLengthOfTimeInMinutes()) : "This session is not timed.")
                 .sessionCategory(String.format("This session is for '%s'", examInstance.getCategory().toString()))
-                .pageableResponseDto((PageableResponseDto) readQuestionResponseDto.getSuitableObjectResponseDto().iterator().next())
+                .pageableResponseDto((PageableResponseDto) readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().iterator().next())
                 .build();
     }
 }

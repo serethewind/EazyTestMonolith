@@ -17,9 +17,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +64,7 @@ public class QuestionService implements QuestionServiceInterface {
 
         return ReadQuestionResponseDto.builder()
                 .message("Batch of questions successfully created")
-                .suitableObjectResponseDto(questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
+                .suitableUserResponseDtoResponseDto(questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
                         .id(questionInstance.getId())
                         .title(questionInstance.getTitle())
                         .option1(questionInstance.getOption1())
@@ -199,6 +197,17 @@ public class QuestionService implements QuestionServiceInterface {
         return mapToReadQuestionResponseDto("Questions successfully generated for exam session based on category and number of questions parameter", filteredQuestionInstances, questionResponseDtoList);
     }
 
+    @Override
+    public ReadQuestionResponseDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize) {
+      List<QuestionInstance> questionInstances = questionId.stream().map(id -> questionRepository.findById(id).orElseThrow(() -> new QuestionResourceNotFoundException("Question resource not found"))).toList();
+
+      Page<QuestionInstance> questionInstancePage = convertListToPage(pageNo, pageSize, questionInstances);
+
+      List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(questionInstancePage);
+
+      return mapToReadQuestionResponseDto("Questions retrieved successfully based on list of Id", questionInstancePage, questionResponseDtoList);
+    }
+
     private Page<QuestionInstance> convertListToPage(int pageNo, int pageSize, List<QuestionInstance> questionInstances) {
         PagedListHolder<QuestionInstance> questionInstancePagedListHolder = new PagedListHolder<>(questionInstances);
 
@@ -222,7 +231,7 @@ public class QuestionService implements QuestionServiceInterface {
     private ReadQuestionResponseDto mapToReadQuestionResponseDto(String message, Page<QuestionInstance> questionInstances, List<QuestionResponseDto> questionResponseDtoList) {
         return ReadQuestionResponseDto.builder()
                 .message(message)
-                .suitableObjectResponseDto(Collections.singletonList(PageableResponseDto.builder()
+                .suitableUserResponseDtoResponseDto(Collections.singletonList(PageableResponseDto.builder()
                         .questionResponseDtoList(questionResponseDtoList)
                         .pageNo(questionInstances.getNumber())
                         .pageSize(questionInstances.getSize())
@@ -237,7 +246,7 @@ public class QuestionService implements QuestionServiceInterface {
 
         return ReadQuestionResponseDto.builder()
                 .message(message)
-                .suitableObjectResponseDto(Collections.singletonList(QuestionResponseDto.builder()
+                .suitableUserResponseDtoResponseDto(Collections.singletonList(QuestionResponseDto.builder()
                         .id(questionInstance.getId())
                         .title(questionInstance.getTitle())
                         .option1(questionInstance.getOption1())

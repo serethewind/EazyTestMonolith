@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/eazytest/auth/**").permitAll()
                         .requestMatchers("/api/v1/eazytest/question-session/**").hasAuthority("EXAMINER")
                         .requestMatchers("/api/v1/eazytest/exam-session/**").hasAuthority("EXAMINER")
+                        .requestMatchers("/api/v1/eazytest/participant-session/**").hasAuthority( "PARTICIPANT")
                         .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.logout(logout -> logout

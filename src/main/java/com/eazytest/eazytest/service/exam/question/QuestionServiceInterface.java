@@ -2,6 +2,7 @@ package com.eazytest.eazytest.service.exam.question;
 
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.question.QuestionRequestDto;
+import com.eazytest.eazytest.dto.question.QuestionResponseDto;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface QuestionServiceInterface {
 
     ReadQuestionResponseDto reactivateQuestionById(Long questionId);
     ReadQuestionResponseDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category);
+
+    ReadQuestionResponseDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize);
 }

@@ -1,8 +1,5 @@
 package com.eazytest.eazytest.service.exam.examsession;
-import com.eazytest.eazytest.dto.exam.ActivateSessionDto;
-import com.eazytest.eazytest.dto.exam.ExamRequestDto;
-import com.eazytest.eazytest.dto.exam.ExamUpdateRequestDto;
-import com.eazytest.eazytest.dto.exam.SessionWithGeneratedQuestionsDto;
+import com.eazytest.eazytest.dto.exam.*;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.question.PageableResponseDto;
 
@@ -19,6 +16,8 @@ public interface ExamServiceInterface {
 
     ReadResponseDto fetchExamSessionByExaminer(String examinerId, String sessionId);
 
+    ReadResponseDto fetchActiveExamSessions();
+
     ReadResponseDto fetchAllExamSessionByExaminer(String examinerId);
 
     ReadResponseDto initiateExamSessionForParticipants(ActivateSessionDto activateSessionDto);
@@ -28,4 +27,6 @@ public interface ExamServiceInterface {
     ReadResponseDto createExamSessionInBatch(List<ExamRequestDto> examRequestDtoList);
 
     SessionWithGeneratedQuestionsDto generateQuestionsForExamSession(String sessionId, int pageNo, int PageSize);
+
+    SessionWithGeneratedQuestionsDto viewExamSessionForParticipant(TakeExamSessionDto takeExamSessionDto, int pageNo, int pageSize);
 }
