@@ -159,6 +159,11 @@ public class ExamService implements ExamServiceInterface {
     }
 
     @Override
+    public ReadResponseDto fetchActiveExamSessions() {
+        return null;
+    }
+
+    @Override
     public ReadResponseDto fetchAllExamSessionByExaminer(String examinerId) {
         List<ExamInstance> examInstanceList = examRepository.findAll().stream().filter(examInstance -> examInstance.getExaminerClass().getExaminerId().equals(examinerId)).toList();
 
@@ -315,5 +320,10 @@ public class ExamService implements ExamServiceInterface {
                 .sessionCategory(String.format("This session is for '%s'", examInstance.getCategory().toString()))
                 .pageableResponseDto((PageableResponseDto) readQuestionResponseDto.getSuitableUserResponseDtoResponseDto().iterator().next())
                 .build();
+    }
+
+    @Override
+    public SessionWithGeneratedQuestionsDto viewExamSessionForParticipant(TakeExamSessionDto takeExamSessionDto, int pageNo, int pageSize) {
+        return null;
     }
 }
