@@ -26,6 +26,7 @@ public interface QuestionServiceInterface {
 
     ReadQuestionResponseDto reactivateQuestionById(Long questionId);
     ReadQuestionResponseAlternativeDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category);
+    List<QuestionResponseDto> generateQuestionsForExamSession(int numberOfQuestions, String category);
 
     ReadQuestionResponseAlternativeDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize);
 }

@@ -304,15 +304,25 @@ public class ExamService implements ExamServiceInterface {
     public SessionWithGeneratedQuestionsDto generateQuestionsForExamSession(String sessionId, int pageNo, int pageSize) {
         ExamInstance examInstance = examRepository.findById(sessionId).orElseThrow(() -> new ExamResourceNotFoundException(String.format("Exam session with id: '%s' not found", sessionId)));
 
-        PageableResponseDto pageableResponseDto = questionService.generateQuestionsForExamSession(pageNo, pageSize, examInstance.getNumberOfQuestions(), examInstance.getCategory().toString()).getPageableResponseDtoList().iterator().next();
+//        PageableResponseDto pageableResponseDto = questionService.generateQuestionsForExamSession(pageNo, pageSize, examInstance.getNumberOfQuestions(), examInstance.getCategory().toString()).getPageableResponseDtoList().iterator().next();
+//
+//        List<QuestionResponseDto> questionResponseDtoList = pageableResponseDto.getQuestionResponseDtoList();
 
-        List<QuestionResponseDto> questionResponseDtoList = pageableResponseDto.getQuestionResponseDtoList();
+        List<QuestionResponseDto> questionResponseDtos = questionService.generateQuestionsForExamSession(examInstance.getNumberOfQuestions(), examInstance.getCategory().toString());
 
-        if (questionResponseDtoList.isEmpty()) {
+        if (questionResponseDtos.isEmpty()) {
             throw new FailedRequestException("Question service failed to respond. Try again later");
         }
 
-        List<Long> questionId = questionResponseDtoList.stream().map(QuestionResponseDto::getId).collect(Collectors.toList());
+        PagedListHolder<QuestionResponseDto> questionInstancePagedListHolder = new PagedListHolder<>(questionResponseDtos);
+
+        questionInstancePagedListHolder.setPage(pageNo);
+        questionInstancePagedListHolder.setPageSize(pageSize);
+
+        Page<QuestionResponseDto> questionResponseDtoPage = new PageImpl<>(questionInstancePagedListHolder.getPageList(), PageRequest.of(pageNo, pageSize), questionResponseDtos.size());
+
+
+        List<Long> questionId = questionResponseDtos.stream().map(QuestionResponseDto::getId).collect(Collectors.toList());
         log.info(String.format("the list of question just discovered is '%d'", questionId.size()));
 
         examInstance.setQuestionsList(questionId);
@@ -325,7 +335,14 @@ public class ExamService implements ExamServiceInterface {
                 .sessionTime(
                         (examInstance.getIsTimed() == TimeType.ENABLED) ? String.format("The session is timed and will span '%d' minutes", examInstance.getLengthOfTimeInMinutes()) : "This session is not timed.")
                 .sessionCategory(String.format("This session is for '%s'", examInstance.getCategory().toString()))
-                .pageableResponseDto(pageableResponseDto)
+                .pageableResponseDto(PageableResponseDto.builder()
+                        .questionResponseDtoList(questionResponseDtoPage.getContent())
+                        .pageNo(questionResponseDtoPage.getNumber())
+                        .pageSize(questionResponseDtoPage.getSize())
+                        .totalElements(questionResponseDtoPage.getTotalElements())
+                        .totalPages(questionResponseDtoPage.getTotalPages())
+                        .last(questionResponseDtoPage.isLast())
+                        .build())
                 .build();
     }
 

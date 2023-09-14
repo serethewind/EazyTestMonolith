@@ -34,6 +34,7 @@ public class ExamInstance {
 
     private TimeType isTimed;
     private Long lengthOfTimeInMinutes;
+    @ElementCollection
     private List<Long> questionsList;
     @ManyToMany
     @JoinTable(name = "participant_list",

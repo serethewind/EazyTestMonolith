@@ -199,6 +199,27 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
+    public List<QuestionResponseDto> generateQuestionsForExamSession(int numberOfQuestions, String category) {
+        List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).collect(Collectors.toList());
+
+        if (questionInstances.isEmpty()) {
+            throw new QuestionResourceNotFoundException("Question with category requested for is empty");
+        }
+
+        Collections.shuffle(questionInstances);
+        questionInstances = questionInstances.subList(0, numberOfQuestions);
+
+        return questionInstances.stream().map(questionInstance -> QuestionResponseDto.builder()
+                .id(questionInstance.getId())
+                .title(questionInstance.getTitle())
+                .option1(questionInstance.getOption1())
+                .option2(questionInstance.getOption2())
+                .option3(questionInstance.getOption3())
+                .option4(questionInstance.getOption4())
+                .build()).collect(Collectors.toList());
+    }
+
+    @Override
     public ReadQuestionResponseAlternativeDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize) {
       List<QuestionInstance> questionInstances = questionId.stream().map(id -> questionRepository.findById(id).orElseThrow(() -> new QuestionResourceNotFoundException("Question resource not found"))).toList();
 
