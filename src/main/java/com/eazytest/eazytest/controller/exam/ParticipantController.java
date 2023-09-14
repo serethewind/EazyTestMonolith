@@ -1,7 +1,9 @@
 package com.eazytest.eazytest.controller.exam;
 
 import com.eazytest.eazytest.dto.exam.SessionWithGeneratedQuestionsDto;
+import com.eazytest.eazytest.dto.exam.SubmitScoreDto;
 import com.eazytest.eazytest.dto.exam.TakeExamSessionDto;
+import com.eazytest.eazytest.dto.general.ReadAnswerResponseDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.service.exam.examsession.ExamService;
 import lombok.AllArgsConstructor;
@@ -24,5 +26,10 @@ public class ParticipantController {
     @PostMapping("take-exam-session")
     public ResponseEntity<SessionWithGeneratedQuestionsDto> takeActiveExamSession(@RequestBody TakeExamSessionDto takeExamSessionDto, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo, @RequestParam(value = "pageSize", defaultValue = "3", required = false)int pageSize){
         return new ResponseEntity<>(examService.viewExamSessionForParticipant(takeExamSessionDto, pageNo, pageSize), HttpStatus.OK);
+    }
+
+    @PostMapping("submit-response")
+    public ResponseEntity<ReadAnswerResponseDto> submitResponseForExamSession(@RequestBody SubmitScoreDto submitScoreDto){
+        return new ResponseEntity<>(examService.gradeResponseFromParticipant(submitScoreDto), HttpStatus.OK);
     }
 }

@@ -1,7 +1,9 @@
 package com.eazytest.eazytest.service.exam.examsession;
 import com.eazytest.eazytest.dto.exam.*;
+import com.eazytest.eazytest.dto.general.ReadAnswerResponseDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.question.PageableResponseDto;
+import com.eazytest.eazytest.dto.question.RecordDto;
 
 import java.util.List;
 
@@ -29,4 +31,8 @@ public interface ExamServiceInterface {
     SessionWithGeneratedQuestionsDto generateQuestionsForExamSession(String sessionId, int pageNo, int PageSize);
 
     SessionWithGeneratedQuestionsDto viewExamSessionForParticipant(TakeExamSessionDto takeExamSessionDto, int pageNo, int pageSize);
+
+    ReadAnswerResponseDto gradeResponseFromParticipant(SubmitScoreDto submitScoreDto);
+
+    List<RecordDto> fetchParticipantsAndScore(String sessionId);
 }

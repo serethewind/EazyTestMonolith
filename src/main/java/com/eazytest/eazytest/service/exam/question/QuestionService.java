@@ -1,5 +1,6 @@
 package com.eazytest.eazytest.service.exam.question;
 
+import com.eazytest.eazytest.dto.exam.AnswerResponseDto;
 import com.eazytest.eazytest.dto.exam.CategoryType;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
@@ -228,6 +229,20 @@ public class QuestionService implements QuestionServiceInterface {
       List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(questionInstancePage);
 
       return mapToReadQuestionResponseDto("Questions retrieved successfully based on list of Id", questionInstancePage, questionResponseDtoList);
+    }
+
+    @Override
+    public Integer getScores(List<AnswerResponseDto> responses) {
+        Integer rightAnswer = 0;
+
+        for (AnswerResponseDto response : responses){
+            QuestionInstance questionInstance = questionRepository.findById(response.getId()).get();
+            if(response.getResponse().equalsIgnoreCase(questionInstance.getRightAnswer())){
+                rightAnswer++;
+            }
+        }
+
+        return rightAnswer;
     }
 
     private Page<QuestionInstance> convertListToPage(int pageNo, int pageSize, List<QuestionInstance> questionInstances) {

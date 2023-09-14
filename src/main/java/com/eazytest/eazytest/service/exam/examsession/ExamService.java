@@ -1,11 +1,13 @@
 package com.eazytest.eazytest.service.exam.examsession;
 
 import com.eazytest.eazytest.dto.exam.*;
+import com.eazytest.eazytest.dto.general.ReadAnswerResponseDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
 import com.eazytest.eazytest.dto.question.PageableResponseDto;
 import com.eazytest.eazytest.dto.question.QuestionResponseDto;
+import com.eazytest.eazytest.dto.question.RecordDto;
 import com.eazytest.eazytest.entity.exam.ExamInstance;
 import com.eazytest.eazytest.entity.exam.QuestionInstance;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
@@ -26,8 +28,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -377,6 +378,52 @@ public class ExamService implements ExamServiceInterface {
                 .sessionMessage("Do well to read the instructions. This exam can only be taken once. Good luck!")
                 .pageableResponseDto(pageableResponseDtoList)
                 .build();
+    }
+
+    @Override
+    public ReadAnswerResponseDto gradeResponseFromParticipant(SubmitScoreDto submitScoreDto) {
+        ExamInstance examInstance = examRepository.findById(submitScoreDto.getSessionId()).orElseThrow(() -> new ExamResourceNotFoundException(String.format("Session with id: '%s' not found", submitScoreDto.getSessionId())));
+
+        ParticipantType participantType = participantRepository.findById(submitScoreDto.getParticipantId()).orElseThrow(() -> new ResourceNotFoundException(String.format("Participant with id: '%s' not found", submitScoreDto.getParticipantId())));
+
+        if (examInstance.getParticipantType().stream().noneMatch(participant -> participant.getParticipantId().equalsIgnoreCase(submitScoreDto.getParticipantId()))) {
+            throw new BadRequestException("Take session first to view questions");
+        }
+
+        if (submitScoreDto.getAnswerResponseDtoList().size() != examInstance.getQuestionsList().size()) {
+            throw new FailedRequestException("Select answers to all questions to continue");
+        }
+
+        Integer score = questionService.getScores(submitScoreDto.getAnswerResponseDtoList());
+
+        double scoreInPercentage = (double) (score * 100) / examInstance.getQuestionsList().size();
+
+        examInstance.getExamRecord().put(submitScoreDto.getParticipantId(), score);
+        examRepository.save(examInstance);
+
+        return ReadAnswerResponseDto.builder()
+                .message(String.format("Out of '%d' questions, you correctly answered '%d'", submitScoreDto.getAnswerResponseDtoList().size(), score))
+                .sessionId(examInstance.getSessionId())
+                .participantId(participantType.getParticipantId())
+                .sessionScore(String.format("Your score is '%2f' percent", scoreInPercentage))
+                .build();
+    }
+
+    @Override
+    public List<RecordDto> fetchParticipantsAndScore(String sessionId) {
+        ExamInstance examInstance = examRepository.findById(sessionId).orElseThrow(() -> new ExamResourceNotFoundException(String.format("Session with id: '%s' not found", sessionId)));
+
+        if (examInstance.getParticipantType().isEmpty() || examInstance.getExamRecord().isEmpty()){
+            throw new BadRequestException(String.format("Exam session with id: '%s' has no record of participant", sessionId));
+        }
+
+        Set<String> participantsId = examInstance.getExamRecord().keySet();
+
+
+       return participantsId.stream().map(participantId -> RecordDto.builder()
+               .participantId(participantId)
+               .score(examInstance.getExamRecord().get(participantId))
+               .build()).collect(Collectors.toList());
     }
 
     @Override

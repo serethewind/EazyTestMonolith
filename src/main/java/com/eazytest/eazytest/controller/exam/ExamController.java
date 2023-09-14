@@ -5,6 +5,7 @@ import com.eazytest.eazytest.dto.exam.ExamRequestDto;
 import com.eazytest.eazytest.dto.exam.ExamUpdateRequestDto;
 import com.eazytest.eazytest.dto.exam.SessionWithGeneratedQuestionsDto;
 import com.eazytest.eazytest.dto.general.ReadResponseDto;
+import com.eazytest.eazytest.dto.question.RecordDto;
 import com.eazytest.eazytest.service.exam.examsession.ExamService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -68,5 +69,10 @@ public class ExamController {
     @PostMapping("generate-questions/{id}")
     ResponseEntity<SessionWithGeneratedQuestionsDto> generateQuestionsForExamSession(@PathVariable("id") String sessionId, @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo, @RequestParam(value = "pageSize", defaultValue = "8", required = false) int pageSize){
         return new ResponseEntity<>(examService.generateQuestionsForExamSession(sessionId, pageNo, pageSize), HttpStatus.OK);
+    }
+
+    @GetMapping("fetch-records")
+    ResponseEntity<List<RecordDto>> retrieveParticipantsAndScoreBySessionId(@RequestParam String sessionId){
+        return new ResponseEntity<>(examService.fetchParticipantsAndScore(sessionId), HttpStatus.OK);
     }
 }

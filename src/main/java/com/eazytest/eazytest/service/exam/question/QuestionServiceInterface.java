@@ -1,5 +1,6 @@
 package com.eazytest.eazytest.service.exam.question;
 
+import com.eazytest.eazytest.dto.exam.AnswerResponseDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.question.QuestionRequestDto;
@@ -29,4 +30,6 @@ public interface QuestionServiceInterface {
     List<QuestionResponseDto> generateQuestionsForExamSession(int numberOfQuestions, String category);
 
     ReadQuestionResponseAlternativeDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize);
+
+    Integer getScores (List<AnswerResponseDto> responses);
 }
