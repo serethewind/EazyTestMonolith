@@ -159,11 +159,6 @@ public class ExamService implements ExamServiceInterface {
     }
 
     @Override
-    public ReadResponseDto fetchActiveExamSessions() {
-        return null;
-    }
-
-    @Override
     public ReadResponseDto fetchAllExamSessionByExaminer(String examinerId) {
         List<ExamInstance> examInstanceList = examRepository.findAll().stream().filter(examInstance -> examInstance.getExaminerClass().getExaminerId().equals(examinerId)).toList();
 
@@ -325,5 +320,26 @@ public class ExamService implements ExamServiceInterface {
     @Override
     public SessionWithGeneratedQuestionsDto viewExamSessionForParticipant(TakeExamSessionDto takeExamSessionDto, int pageNo, int pageSize) {
         return null;
+    }
+
+    @Override
+    public ReadResponseDto fetchActiveExamSessions() {
+        List<ExamInstance> examInstanceList = examRepository.findAll().stream().filter(ExamInstance::getIsExamActive).toList();
+
+        if (examInstanceList.isEmpty()){
+            throw new ExamResourceNotFoundException("No session is currently active");
+        }
+
+      List<ExamResponseDto> examResponseDtoList = examInstanceList.stream().map(examInstance -> ExamResponseDto.builder()
+                .sessionId(examInstance.getSessionId())
+                .sessionName(examInstance.getSessionName())
+                .sessionDescription(examInstance.getSessionDescription())
+                .examinerId(examInstance.getExaminerClass().getExaminerId())
+                .build()).toList();;
+
+        return ReadResponseDto.builder()
+                .message("The below exam session are currently active: ")
+                .examResponseDtoList(examResponseDtoList)
+                .build();
     }
 }
