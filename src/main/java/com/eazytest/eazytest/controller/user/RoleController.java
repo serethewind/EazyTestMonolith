@@ -1,6 +1,7 @@
 package com.eazytest.eazytest.controller.user;
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
+import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 import com.eazytest.eazytest.service.user.role.RoleServiceInteface;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,12 @@ public class RoleController {
     private RoleServiceInteface roleService;
 
     @PostMapping("/examiner")
-    ResponseEntity<ResponseDto> assignExaminerRole(@RequestParam Long userId) {
+    ResponseEntity<ResponseUserTypeDto> assignExaminerRole(@RequestParam Long userId) {
         return new ResponseEntity<>(roleService.assignExaminerRole(userId), HttpStatus.OK);
     }
 
     @PostMapping("/participant")
-    ResponseEntity<ResponseDto> assignParticipantRole(@RequestParam Long userId) {
+    ResponseEntity<ResponseUserTypeDto> assignParticipantRole(@RequestParam Long userId) {
         return new ResponseEntity<>(roleService.assignParticipantRole(userId), HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.eazytest.eazytest.service.user.userInfo;
 
+import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 import com.eazytest.eazytest.dto.user.UserInfoUpdateDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
@@ -11,6 +12,8 @@ public interface UserInfoServiceInterface {
     ResponseDto updateUserInformation(Long userId, UserInfoUpdateDto userInfoUpdateDto);
     List<UserResponseDto> fetchAllUsers();
     UserResponseDto findUserById(Long id);
+
+    List<ResponseUserTypeDto> findUserByUserType(String userType);
     /*
     findAllParticipantsByExamSessionId
 

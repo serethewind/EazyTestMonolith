@@ -1,5 +1,6 @@
 package com.eazytest.eazytest.service.user.userInfo;
 
+import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 import com.eazytest.eazytest.dto.user.UserInfoUpdateDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
@@ -49,7 +50,6 @@ public class UserInfoService implements UserInfoServiceInterface{
                                .build()
                )
                .build();
-
     }
 
     @Override
@@ -67,5 +67,20 @@ public class UserInfoService implements UserInfoServiceInterface{
                 .userId(user.getId())
                 .userName(user.getUsername())
                 .build();
+    }
+
+    @Override
+    public List<ResponseUserTypeDto> findUserByUserType(String userType) {
+      List<UserType> userTypeList = userRepository.findAll().stream().filter(user -> user.getRoleEnums().stream().toString().contains(userType)).toList();
+
+      if (userTypeList.isEmpty()){
+          throw new ResourceNotFoundException(String.format("User of type: '%s' not found", userType));
+      }
+
+      return userTypeList.stream().map(userInstance -> ResponseUserTypeDto.builder()
+              .message("Fetched Successfully")
+              .userTypeId(userInstance.getParticipantType().getParticipantId())
+              .userName(userInstance.getUsername())
+              .build()).collect(Collectors.toList());
     }
 }
