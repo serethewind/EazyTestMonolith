@@ -1,8 +1,10 @@
 package com.eazytest.eazytest.config;
 
 import lombok.AllArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -36,7 +38,16 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+//    @Bean
+//    @Order(2)
+//    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
+//        http.securityMatcher(String.valueOf(EndpointRequest.toAnyEndpoint()));
+//        http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll());
+//        return http.build();
+//    }
+
     @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
