@@ -1,6 +1,8 @@
 package com.eazytest.eazytest.service.exam.question;
 
+import com.eazytest.eazytest.dto.exam.AnswerResponseDto;
 import com.eazytest.eazytest.dto.exam.CategoryType;
+import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseDto;
 import com.eazytest.eazytest.dto.question.Difficulty;
 import com.eazytest.eazytest.dto.question.PageableResponseDto;
@@ -17,9 +19,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +66,7 @@ public class QuestionService implements QuestionServiceInterface {
 
         return ReadQuestionResponseDto.builder()
                 .message("Batch of questions successfully created")
-                .suitableObjectResponseDto(questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
+                .questionResponseDtoList(questionInstanceList.stream().map(questionInstance -> QuestionResponseDto.builder()
                         .id(questionInstance.getId())
                         .title(questionInstance.getTitle())
                         .option1(questionInstance.getOption1())
@@ -78,7 +78,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto fetchAllQuestions(int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto fetchAllQuestions(int pageNo, int pageSize) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
@@ -103,7 +103,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto findQuestionsByCategory(String category, int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto findQuestionsByCategory(String category, int pageNo, int pageSize) {
 
         List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).toList();
 
@@ -119,7 +119,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto findQuestionBySearchQuery(String searchWord, int pageNo, int pageSize) {
+    public ReadQuestionResponseAlternativeDto findQuestionBySearchQuery(String searchWord, int pageNo, int pageSize) {
         List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getTitle().toLowerCase().contains(searchWord.toLowerCase())).toList();
 
         if (questionInstances.isEmpty()) {
@@ -179,7 +179,7 @@ public class QuestionService implements QuestionServiceInterface {
     }
 
     @Override
-    public ReadQuestionResponseDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category) {
+    public ReadQuestionResponseAlternativeDto generateQuestionsForExamSession(int pageNo, int pageSize, int numberOfQuestions, String category) {
 
         List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).collect(Collectors.toList());
 
@@ -188,7 +188,7 @@ public class QuestionService implements QuestionServiceInterface {
         }
 
         Collections.shuffle(questionInstances);
-       questionInstances = questionInstances.subList(0, numberOfQuestions - 1);
+       questionInstances = questionInstances.subList(0, numberOfQuestions);
 
         Page<QuestionInstance> filteredQuestionInstances = convertListToPage(pageNo, pageSize, questionInstances);
 
@@ -197,6 +197,52 @@ public class QuestionService implements QuestionServiceInterface {
         log.info(String.format("the number of questions is '%d'", numberOfQuestions));
 
         return mapToReadQuestionResponseDto("Questions successfully generated for exam session based on category and number of questions parameter", filteredQuestionInstances, questionResponseDtoList);
+    }
+
+    @Override
+    public List<QuestionResponseDto> generateQuestionsForExamSession(int numberOfQuestions, String category) {
+        List<QuestionInstance> questionInstances = questionRepository.findAll().stream().filter(questionInstance -> questionInstance.getExamCategory().toString().equalsIgnoreCase(category)).collect(Collectors.toList());
+
+        if (questionInstances.isEmpty()) {
+            throw new QuestionResourceNotFoundException("Question with category requested for is empty");
+        }
+
+        Collections.shuffle(questionInstances);
+        questionInstances = questionInstances.subList(0, numberOfQuestions);
+
+        return questionInstances.stream().map(questionInstance -> QuestionResponseDto.builder()
+                .id(questionInstance.getId())
+                .title(questionInstance.getTitle())
+                .option1(questionInstance.getOption1())
+                .option2(questionInstance.getOption2())
+                .option3(questionInstance.getOption3())
+                .option4(questionInstance.getOption4())
+                .build()).collect(Collectors.toList());
+    }
+
+    @Override
+    public ReadQuestionResponseAlternativeDto findBatchOfQuestionsByListOfId(List<Long> questionId, int pageNo, int pageSize) {
+      List<QuestionInstance> questionInstances = questionId.stream().map(id -> questionRepository.findById(id).orElseThrow(() -> new QuestionResourceNotFoundException("Question resource not found"))).toList();
+
+      Page<QuestionInstance> questionInstancePage = convertListToPage(pageNo, pageSize, questionInstances);
+
+      List<QuestionResponseDto> questionResponseDtoList = mapToQuestionResponseDto(questionInstancePage);
+
+      return mapToReadQuestionResponseDto("Questions retrieved successfully based on list of Id", questionInstancePage, questionResponseDtoList);
+    }
+
+    @Override
+    public Integer getScores(List<AnswerResponseDto> responses) {
+        Integer rightAnswer = 0;
+
+        for (AnswerResponseDto response : responses){
+            QuestionInstance questionInstance = questionRepository.findById(response.getId()).get();
+            if(response.getResponse().equalsIgnoreCase(questionInstance.getRightAnswer())){
+                rightAnswer++;
+            }
+        }
+
+        return rightAnswer;
     }
 
     private Page<QuestionInstance> convertListToPage(int pageNo, int pageSize, List<QuestionInstance> questionInstances) {
@@ -219,10 +265,10 @@ public class QuestionService implements QuestionServiceInterface {
                 .build()).collect(Collectors.toList());
     }
 
-    private ReadQuestionResponseDto mapToReadQuestionResponseDto(String message, Page<QuestionInstance> questionInstances, List<QuestionResponseDto> questionResponseDtoList) {
-        return ReadQuestionResponseDto.builder()
+    private ReadQuestionResponseAlternativeDto mapToReadQuestionResponseDto(String message, Page<QuestionInstance> questionInstances, List<QuestionResponseDto> questionResponseDtoList) {
+        return ReadQuestionResponseAlternativeDto.builder()
                 .message(message)
-                .suitableObjectResponseDto(Collections.singletonList(PageableResponseDto.builder()
+                .pageableResponseDtoList(Collections.singletonList(PageableResponseDto.builder()
                         .questionResponseDtoList(questionResponseDtoList)
                         .pageNo(questionInstances.getNumber())
                         .pageSize(questionInstances.getSize())
@@ -237,7 +283,7 @@ public class QuestionService implements QuestionServiceInterface {
 
         return ReadQuestionResponseDto.builder()
                 .message(message)
-                .suitableObjectResponseDto(Collections.singletonList(QuestionResponseDto.builder()
+                .questionResponseDtoList(Collections.singletonList(QuestionResponseDto.builder()
                         .id(questionInstance.getId())
                         .title(questionInstance.getTitle())
                         .option1(questionInstance.getOption1())

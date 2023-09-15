@@ -9,7 +9,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -34,6 +36,7 @@ public class ExamInstance {
 
     private TimeType isTimed;
     private Long lengthOfTimeInMinutes;
+    @ElementCollection
     private List<Long> questionsList;
     @ManyToMany
     @JoinTable(name = "participant_list",
@@ -41,6 +44,12 @@ public class ExamInstance {
             inverseJoinColumns = @JoinColumn(name = "participantId")
     )
     private List<ParticipantType> participantType;
+
+    @ElementCollection
+    @CollectionTable(name = "exam_record_details", joinColumns = @JoinColumn(name = "session_id"))
+    @MapKeyColumn(name = "part_id")
+    @Column(name = "part_score")
+    private Map<String, Integer> examRecord = new HashMap<>();
     @CreationTimestamp
     private LocalDateTime sessionCreatedDate;
 }

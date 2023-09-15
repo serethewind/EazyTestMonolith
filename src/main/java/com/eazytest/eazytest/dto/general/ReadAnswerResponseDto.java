@@ -1,18 +1,18 @@
 package com.eazytest.eazytest.dto.general;
 
-import com.eazytest.eazytest.dto.question.QuestionResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class ReadQuestionResponseDto {
+@Data
+public class ReadAnswerResponseDto {
+
     private String message;
-    private List<QuestionResponseDto> questionResponseDtoList;
+    private String sessionId;
+    private String participantId;
+    private String sessionScore;
 }
