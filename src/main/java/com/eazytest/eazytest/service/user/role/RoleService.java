@@ -1,6 +1,7 @@
 package com.eazytest.eazytest.service.user.role;
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
+import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
 import com.eazytest.eazytest.entity.userType.ParticipantType;
@@ -22,7 +23,7 @@ public class RoleService implements RoleServiceInteface {
 
 
     @Override
-    public ResponseDto assignParticipantRole(Long userId) {
+    public ResponseUserTypeDto assignParticipantRole(Long userId) {
         UserType userType = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         userType.getRoleEnums().add(RoleEnum.PARTICIPANT);
@@ -34,19 +35,15 @@ public class RoleService implements RoleServiceInteface {
         userType.setParticipantType(participantType);
         userRepository.save(userType);
 
-    return ResponseDto.builder()
+    return ResponseUserTypeDto.builder()
             .message("Participant role successfully assigned to user")
-            .userResponseDto(
-                    UserResponseDto.builder()
-                            .userId(userId)
-                            .userName(userType.getUsername())
-                            .build()
-            )
+            .userTypeId(participantType.getParticipantId())
+            .userName(userType.getUsername())
             .build();
     }
 
     @Override
-    public ResponseDto assignExaminerRole(Long userId) {
+    public ResponseUserTypeDto assignExaminerRole(Long userId) {
         UserType userType = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userType.getRoleEnums().add(RoleEnum.EXAMINER);
 
@@ -57,14 +54,10 @@ public class RoleService implements RoleServiceInteface {
         userType.setExaminerType(examinerType);
         userRepository.save(userType);
 
-        return ResponseDto.builder()
+        return ResponseUserTypeDto.builder()
                 .message("Examiner role successfully assigned to user")
-                .userResponseDto(
-                        UserResponseDto.builder()
-                                .userId(userId)
-                                .userName(userType.getUsername())
-                                .build()
-                )
+                .userTypeId(examinerType.getExaminerId())
+                .userName(userType.getUsername())
                 .build();
     }
 }

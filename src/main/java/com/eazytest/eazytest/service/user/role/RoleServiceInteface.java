@@ -2,10 +2,11 @@ package com.eazytest.eazytest.service.user.role;
 
 
 import com.eazytest.eazytest.dto.general.ResponseDto;
+import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 
 public interface RoleServiceInteface {
 
-    ResponseDto assignParticipantRole(Long userId);
+    ResponseUserTypeDto assignParticipantRole(Long userId);
 
-    ResponseDto assignExaminerRole(Long userId);
+    ResponseUserTypeDto assignExaminerRole(Long userId);
 }
