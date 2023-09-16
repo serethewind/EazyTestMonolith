@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.eazytest.eazytest.EazyTestApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-09-16T12:07:48" hostname="IACADEMY-NOAH" time="1.696">
+<testsuite name="com.eazytest.eazytest.EazyTestApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-09-16T12:23:13" hostname="IACADEMY-NOAH" time="1.001">
   <properties/>
-  <testcase name="contextLoads()" classname="com.eazytest.eazytest.EazyTestApplicationTests" time="1.696"/>
-  <system-out><![CDATA[13:07:40.561 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.eazytest.eazytest.EazyTestApplicationTests]: EazyTestApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-13:07:40.685 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.eazytest.eazytest.EazyTestApplication for test class com.eazytest.eazytest.EazyTestApplicationTests
+  <testcase name="contextLoads()" classname="com.eazytest.eazytest.EazyTestApplicationTests" time="1.001"/>
+  <system-out><![CDATA[13:23:03.823 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.eazytest.eazytest.EazyTestApplicationTests]: EazyTestApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:23:03.936 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.eazytest.eazytest.EazyTestApplication for test class com.eazytest.eazytest.EazyTestApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -13,26 +13,26 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.1.3)
 
-2023-09-16T13:07:41.180+01:00  INFO 24376 --- [    Test worker] c.e.eazytest.EazyTestApplicationTests    : Starting EazyTestApplicationTests using Java 20 with PID 24376 (started by Noah.Johnson in C:\Users\noah.johnson\IdeaProjects\EazyTestMonolith)
-2023-09-16T13:07:41.183+01:00  INFO 24376 --- [    Test worker] c.e.eazytest.EazyTestApplicationTests    : No active profile set, falling back to 1 default profile: "default"
-2023-09-16T13:07:42.418+01:00  INFO 24376 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2023-09-16T13:07:42.509+01:00  INFO 24376 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 78 ms. Found 6 JPA repository interfaces.
-2023-09-16T13:07:43.133+01:00  INFO 24376 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2023-09-16T13:07:43.204+01:00  INFO 24376 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.7.Final
-2023-09-16T13:07:43.208+01:00  INFO 24376 --- [    Test worker] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
-2023-09-16T13:07:43.387+01:00  INFO 24376 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
-2023-09-16T13:07:43.569+01:00  INFO 24376 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2023-09-16T13:07:43.595+01:00  INFO 24376 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2023-09-16T13:07:44.086+01:00  INFO 24376 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@30e2016a
-2023-09-16T13:07:44.089+01:00  INFO 24376 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2023-09-16T13:07:44.579+01:00  INFO 24376 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
-2023-09-16T13:07:45.509+01:00  INFO 24376 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2023-09-16T13:07:45.808+01:00  INFO 24376 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2023-09-16T13:07:46.282+01:00  INFO 24376 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2023-09-16T13:07:46.843+01:00  WARN 24376 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2023-09-16T13:07:47.439+01:00  INFO 24376 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 13 endpoint(s) beneath base path '/actuator'
-2023-09-16T13:07:47.461+01:00  INFO 24376 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@401e36ab, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@4ce66169, org.springframework.security.web.context.SecurityContextHolderFilter@6bcf2780, org.springframework.security.web.header.HeaderWriterFilter@77ef7b2b, org.springframework.web.filter.CorsFilter@53d0cf4d, org.springframework.security.web.authentication.logout.LogoutFilter@e8c381e, com.eazytest.eazytest.config.JwtAuthenticationFilter@1635e239, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@11544ddd, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4c53ce60, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3c6c87fa, org.springframework.security.web.session.SessionManagementFilter@4a3d4cd2, org.springframework.security.web.access.ExceptionTranslationFilter@60bd11f7, org.springframework.security.web.access.intercept.AuthorizationFilter@5827908c]
-2023-09-16T13:07:47.928+01:00  INFO 24376 --- [    Test worker] c.e.eazytest.EazyTestApplicationTests    : Started EazyTestApplicationTests in 7.053 seconds (process running for 8.633)
+2023-09-16T13:23:04.394+01:00  INFO 26104 --- [    Test worker] c.e.eazytest.EazyTestApplicationTests    : Starting EazyTestApplicationTests using Java 20 with PID 26104 (started by Noah.Johnson in C:\Users\noah.johnson\IdeaProjects\EazyTestMonolith)
+2023-09-16T13:23:04.397+01:00  INFO 26104 --- [    Test worker] c.e.eazytest.EazyTestApplicationTests    : No active profile set, falling back to 1 default profile: "default"
+2023-09-16T13:23:05.763+01:00  INFO 26104 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-09-16T13:23:05.890+01:00  INFO 26104 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 113 ms. Found 6 JPA repository interfaces.
+2023-09-16T13:23:07.037+01:00  INFO 26104 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-09-16T13:23:07.643+01:00  INFO 26104 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.7.Final
+2023-09-16T13:23:07.653+01:00  INFO 26104 --- [    Test worker] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2023-09-16T13:23:08.043+01:00  INFO 26104 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-09-16T13:23:08.280+01:00  INFO 26104 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2023-09-16T13:23:08.301+01:00  INFO 26104 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-09-16T13:23:08.794+01:00  INFO 26104 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@19647566
+2023-09-16T13:23:08.796+01:00  INFO 26104 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-09-16T13:23:09.400+01:00  INFO 26104 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-09-16T13:23:10.833+01:00  INFO 26104 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-09-16T13:23:11.065+01:00  INFO 26104 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-09-16T13:23:11.619+01:00  INFO 26104 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2023-09-16T13:23:12.290+01:00  WARN 26104 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-09-16T13:23:13.114+01:00  INFO 26104 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 13 endpoint(s) beneath base path '/actuator'
+2023-09-16T13:23:13.154+01:00  INFO 26104 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@c04b755, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6eec092, org.springframework.security.web.context.SecurityContextHolderFilter@40a32c25, org.springframework.security.web.header.HeaderWriterFilter@542adcfa, org.springframework.web.filter.CorsFilter@7d9587b3, org.springframework.security.web.authentication.logout.LogoutFilter@4efb7c99, com.eazytest.eazytest.config.JwtAuthenticationFilter@19984625, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@56957f08, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@32c7495, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@5ce50c82, org.springframework.security.web.session.SessionManagementFilter@2771e501, org.springframework.security.web.access.ExceptionTranslationFilter@4c752425, org.springframework.security.web.access.intercept.AuthorizationFilter@1a2d8488]
+2023-09-16T13:23:13.745+01:00  INFO 26104 --- [    Test worker] c.e.eazytest.EazyTestApplicationTests    : Started EazyTestApplicationTests in 9.617 seconds (process running for 11.252)
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
