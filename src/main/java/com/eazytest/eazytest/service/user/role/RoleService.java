@@ -1,5 +1,6 @@
 package com.eazytest.eazytest.service.user.role;
 
+import com.eazytest.eazytest.dto.email.EmailDetails;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
@@ -10,6 +11,7 @@ import com.eazytest.eazytest.entity.userType.UserType;
 import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.user.ParticipantRepository;
 import com.eazytest.eazytest.repository.user.UserRepository;
+import com.eazytest.eazytest.service.email.EmailServiceInterface;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class RoleService implements RoleServiceInteface {
     private UserRepository userRepository;
     private ExaminerRepository examinerRepository;
     private ParticipantRepository participantRepository;
+    private EmailServiceInterface emailServiceInterface;
 
 
     @Override
@@ -34,6 +37,14 @@ public class RoleService implements RoleServiceInteface {
         participantRepository.save(participantType);
         userType.setParticipantType(participantType);
         userRepository.save(userType);
+
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(userType.getEmail())
+                .subject("Participant role successfully assigned")
+                .messageBody(String.format("Hi " + userType.getUsername() + ", Your id is '%s'. ", participantType.getParticipantId()))
+                .build();
+
+        emailServiceInterface.sendSimpleMessage(emailDetails);
 
     return ResponseUserTypeDto.builder()
             .message("Participant role successfully assigned to user")
@@ -54,10 +65,21 @@ public class RoleService implements RoleServiceInteface {
         userType.setExaminerType(examinerType);
         userRepository.save(userType);
 
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(userType.getEmail())
+                .subject("Examiner role successfully assigned")
+                .messageBody(String.format("Hi " + userType.getUsername() + ", Your id is '%s'. ", examinerType.getExaminerId()))
+                .build();
+
+        emailServiceInterface.sendSimpleMessage(emailDetails);
+
         return ResponseUserTypeDto.builder()
                 .message("Examiner role successfully assigned to user")
                 .userTypeId(examinerType.getExaminerId())
                 .userName(userType.getUsername())
                 .build();
     }
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.eazytest.eazytest.service.user.auth;
 
 import com.eazytest.eazytest.config.JWTService;
+import com.eazytest.eazytest.dto.email.EmailDetails;
 import com.eazytest.eazytest.dto.user.UserLoginDto;
 import com.eazytest.eazytest.dto.user.UserRegisterDto;
 import com.eazytest.eazytest.dto.general.ResponseDto;
@@ -11,6 +12,8 @@ import com.eazytest.eazytest.entity.security.Token;
 import com.eazytest.eazytest.entity.security.TokenType;
 import com.eazytest.eazytest.repository.user.UserRepository;
 import com.eazytest.eazytest.repository.security.TokenRepository;
+import com.eazytest.eazytest.service.email.EmailServiceImplementation;
+import com.eazytest.eazytest.service.email.EmailServiceInterface;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +31,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthServiceInterface {
-
+    private EmailServiceInterface emailServiceInterface;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private AuthenticationManager authenticationManager;
@@ -57,6 +60,15 @@ public class AuthServiceImpl implements AuthServiceInterface {
                 .build();
 
         userRepository.save(user);
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(user.getEmail())
+                .subject("Welcome to EazyTest Solutions")
+                .messageBody("Hi " + user.getUsername() + ", Thank you for choosing EazyTest. We can’t wait to help you find the best talents and great organizations. Let’s get started.\n" +
+                        "\n" +
+                        "             One app for finding top talent and great organizations\n")
+                .build();
+
+        emailServiceInterface.sendSimpleMessage(emailDetails);
 
         return new ResponseEntity<>(ResponseDto
                 .builder()

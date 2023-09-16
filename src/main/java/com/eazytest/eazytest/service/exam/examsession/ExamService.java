@@ -1,5 +1,6 @@
 package com.eazytest.eazytest.service.exam.examsession;
 
+import com.eazytest.eazytest.dto.email.EmailDetails;
 import com.eazytest.eazytest.dto.exam.*;
 import com.eazytest.eazytest.dto.general.ReadAnswerResponseDto;
 import com.eazytest.eazytest.dto.general.ReadQuestionResponseAlternativeDto;
@@ -19,6 +20,7 @@ import com.eazytest.eazytest.exception.ResourceNotFoundException;
 import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
 import com.eazytest.eazytest.repository.user.ParticipantRepository;
+import com.eazytest.eazytest.service.email.EmailServiceInterface;
 import com.eazytest.eazytest.service.exam.question.QuestionServiceInterface;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,7 @@ public class ExamService implements ExamServiceInterface {
     private ExaminerRepository examinerRepository;
     private QuestionServiceInterface questionService;
     private ParticipantRepository participantRepository;
+    private EmailServiceInterface emailServiceInterface;
 
     @Override
     public ReadResponseDto createExamSession(ExamRequestDto examRequestDto) {
@@ -59,6 +62,14 @@ public class ExamService implements ExamServiceInterface {
 
         examinerType.getExamInstances().add(examInstance);
         examinerRepository.save(examinerType);
+
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(examinerType.getUserType().getEmail())
+                .subject("Examination session successfully created")
+                .messageBody(String.format("Hello " + examinerType.getUserType().getUsername() + ", Your id is '%s'. Exam session with id: %s created successfully", examinerType.getExaminerId(), examInstance.getSessionId()))
+                .build();
+
+        emailServiceInterface.sendSimpleMessage(emailDetails);
 
 
         return ReadResponseDto.builder()
@@ -217,6 +228,14 @@ public class ExamService implements ExamServiceInterface {
         examInstance.setIsExamActive(true);
         examRepository.save(examInstance);
 
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(examinerType.getUserType().getEmail())
+                .subject("Examination session successfully initiated for participants.")
+                .messageBody(String.format("Hello " + examinerType.getUserType().getUsername() + ", Your id is '%s'. Exam session with id: %s is now active for participants to take.", examinerType.getExaminerId(), examInstance.getSessionId()))
+                .build();
+
+        emailServiceInterface.sendSimpleMessage(emailDetails);
+
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' is now active for participants to take", activateSessionDto.getSessionId()))
                 .examResponseDtoList(Collections.singletonList(
@@ -245,6 +264,14 @@ public class ExamService implements ExamServiceInterface {
 
         examInstance.setIsExamActive(false);
         examRepository.save(examInstance);
+
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(examInstance.getExaminerClass().getUserType().getEmail())
+                .subject("Examination session successfully ended.")
+                .messageBody(String.format("Hello " + examInstance.getExaminerClass().getUserType().getUsername() + ", Your id is '%s'. Exam session with id: %s has been made inactive and is unavailable for participants to take.", examInstance.getExaminerClass().getExaminerId(), examInstance.getSessionId()))
+                .build();
+
+        emailServiceInterface.sendSimpleMessage(emailDetails);
 
         return ReadResponseDto.builder()
                 .message(String.format("Exam session with id: '%s' has been made inactive and is unavailable for participants to take", activateSessionDto.getSessionId()))
@@ -367,6 +394,9 @@ public class ExamService implements ExamServiceInterface {
             examInstance.getParticipantType().add(participantTypeTakingExaminationSession);
             examRepository.save(examInstance);
         }
+
+
+
 
         return SessionWithGeneratedQuestionsDto.builder()
                 .sessionId(examInstance.getSessionId())
