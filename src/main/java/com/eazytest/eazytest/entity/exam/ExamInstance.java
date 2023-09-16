@@ -19,6 +19,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name = "exam instance")
 public class ExamInstance {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

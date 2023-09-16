@@ -10,6 +10,7 @@ import lombok.*;
 @Getter
 @Builder
 @Entity
+@Table(name = "token instance")
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

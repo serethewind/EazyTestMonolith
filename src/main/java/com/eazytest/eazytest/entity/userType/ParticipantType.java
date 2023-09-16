@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table()
 public class ParticipantType {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

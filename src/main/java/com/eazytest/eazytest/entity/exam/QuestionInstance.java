@@ -11,7 +11,7 @@ import lombok.*;
 @Setter
 @Entity
 @Builder
-@Table
+@Table (name = "question instance")
 public class QuestionInstance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
