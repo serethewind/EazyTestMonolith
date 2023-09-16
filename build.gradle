@@ -40,13 +40,6 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.withType(Jar) {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    manifest {
-        attributes["Main-Class"] = "com.eazytest.eazytest.EazyTestApplication"
-    }
-}
 
 tasks.named('test') {
     useJUnitPlatform()
