@@ -13,10 +13,8 @@ import com.eazytest.eazytest.entity.exam.ExamInstance;
 import com.eazytest.eazytest.entity.exam.QuestionInstance;
 import com.eazytest.eazytest.entity.userType.ExaminerType;
 import com.eazytest.eazytest.entity.userType.ParticipantType;
-import com.eazytest.eazytest.exception.BadRequestException;
-import com.eazytest.eazytest.exception.ExamResourceNotFoundException;
-import com.eazytest.eazytest.exception.FailedRequestException;
-import com.eazytest.eazytest.exception.ResourceNotFoundException;
+import com.eazytest.eazytest.entity.userType.SubscriptionType;
+import com.eazytest.eazytest.exception.*;
 import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.exam.ExamRepository;
 import com.eazytest.eazytest.repository.user.ParticipantRepository;
@@ -46,6 +44,10 @@ public class ExamService implements ExamServiceInterface {
     @Override
     public ReadResponseDto createExamSession(ExamRequestDto examRequestDto) {
         ExaminerType examinerType = examinerRepository.findById(examRequestDto.getExaminerId()).orElseThrow(() -> new ResourceNotFoundException("Examiner with examinerId : " + examRequestDto.getExaminerId() + "not found"));
+
+        if (examinerType.getSubscriptionType().toString().equalsIgnoreCase(SubscriptionType.FREE.toString())  && examinerType.getExamInstances().size() > 2) {
+            throw new SubscriptionTypeException("FREE USERS GET ONLY 2 EXAM INSTANCES");
+        }
 
         ExamInstance examInstance = ExamInstance.builder()
                 .examinerClass(examinerType)
@@ -302,6 +304,10 @@ public class ExamService implements ExamServiceInterface {
 
         if (!allMatch) {
             throw new BadRequestException("Examiner id doesn't match for all the exam sessions in the batch");
+        }
+
+        if (examinerType.getSubscriptionType().toString().equalsIgnoreCase(SubscriptionType.FREE.toString())  && examinerType.getExamInstances().size() > 2) {
+            throw new SubscriptionTypeException("FREE USERS GET ONLY 2 EXAM INSTANCES");
         }
 
         List<ExamInstance> examInstanceList = examRequestDtoList.stream().map(examRequestDto -> examRepository.save(

@@ -23,6 +23,7 @@ public class ExaminerType {
     private UserType userType;
     @OneToMany(mappedBy = "examinerClass", cascade = CascadeType.ALL)
     private List<ExamInstance> examInstances = new ArrayList<>();
-
+    @Enumerated(EnumType.STRING)
+    private SubscriptionType subscriptionType;
 //    private List<ExamSession> examSessions;
 }
