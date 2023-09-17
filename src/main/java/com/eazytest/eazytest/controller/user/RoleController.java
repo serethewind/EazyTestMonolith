@@ -15,12 +15,12 @@ public class RoleController {
     private RoleServiceInteface roleService;
 
     @PostMapping("/examiner")
-    ResponseEntity<ResponseUserTypeDto> assignExaminerRole(@RequestParam Long userId) {
+    public ResponseEntity<ResponseUserTypeDto> assignExaminerRole(@RequestParam Long userId) {
         return new ResponseEntity<>(roleService.assignExaminerRole(userId), HttpStatus.OK);
     }
 
     @PostMapping("/participant")
-    ResponseEntity<ResponseUserTypeDto> assignParticipantRole(@RequestParam Long userId) {
+    public ResponseEntity<ResponseUserTypeDto> assignParticipantRole(@RequestParam Long userId) {
         return new ResponseEntity<>(roleService.assignParticipantRole(userId), HttpStatus.OK);
     }
 }
