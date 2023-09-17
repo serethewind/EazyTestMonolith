@@ -38,22 +38,14 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-//    @Bean
-//    @Order(2)
-//    public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity http) throws Exception {
-//        http.securityMatcher(String.valueOf(EndpointRequest.toAnyEndpoint()));
-//        http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll());
-//        return http.build();
-//    }
-
     @Bean
-    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/v1/eazytest/auth/**").permitAll()
                         .requestMatchers("/api/v1/eazytest/question-session/**").hasAuthority("EXAMINER")
                         .requestMatchers("/api/v1/eazytest/exam-session/**").hasAuthority("EXAMINER")

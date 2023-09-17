@@ -21,12 +21,12 @@ public class AuthController {
     private LogoutService logoutService;
 
     @PostMapping("/login")
-    ResponseEntity<ResponseDto> userLogin(@RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<ResponseDto> userLogin(@RequestBody UserLoginDto userLoginDto) {
         return authService.loginUser(userLoginDto);
     }
 
     @PostMapping("/signup")
-    ResponseEntity<ResponseDto> userSignup(@RequestBody UserRegisterDto userRegisterDto) {
+    public ResponseEntity<ResponseDto> userSignup(@RequestBody UserRegisterDto userRegisterDto) {
         return authService.registerUser(userRegisterDto);
     }
 
