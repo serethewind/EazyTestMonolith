@@ -4,10 +4,7 @@ import com.eazytest.eazytest.dto.email.EmailDetails;
 import com.eazytest.eazytest.dto.general.ResponseDto;
 import com.eazytest.eazytest.dto.general.ResponseUserTypeDto;
 import com.eazytest.eazytest.dto.general.UserResponseDto;
-import com.eazytest.eazytest.entity.userType.ExaminerType;
-import com.eazytest.eazytest.entity.userType.ParticipantType;
-import com.eazytest.eazytest.entity.userType.RoleEnum;
-import com.eazytest.eazytest.entity.userType.UserType;
+import com.eazytest.eazytest.entity.userType.*;
 import com.eazytest.eazytest.repository.user.ExaminerRepository;
 import com.eazytest.eazytest.repository.user.ParticipantRepository;
 import com.eazytest.eazytest.repository.user.UserRepository;
@@ -60,6 +57,7 @@ public class RoleService implements RoleServiceInteface {
 
         ExaminerType examinerType = ExaminerType.builder()
                 .userType(userType)
+                .subscriptionType(SubscriptionType.FREE)
                 .build();
         examinerRepository.save(examinerType);
         userType.setExaminerType(examinerType);

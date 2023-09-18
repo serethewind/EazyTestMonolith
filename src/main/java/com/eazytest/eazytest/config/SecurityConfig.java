@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/v1/eazytest/auth/**").permitAll()
+                        .requestMatchers("/api/v1/eazytest/auth/**", "api/v1/eazytest/monnify/**").permitAll()
                         .requestMatchers("/api/v1/eazytest/question-session/**").hasAuthority("EXAMINER")
                         .requestMatchers("/api/v1/eazytest/exam-session/**").hasAuthority("EXAMINER")
                         .requestMatchers("/api/v1/eazytest/participant-session/**").hasAuthority( "PARTICIPANT")

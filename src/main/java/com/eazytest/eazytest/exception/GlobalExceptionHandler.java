@@ -32,11 +32,15 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(mapToErrorDetails(exception, "BAD_REQUEST", webRequest), HttpStatus.BAD_REQUEST);
     }
-
     @ExceptionHandler(EmailAlreadyExistException.class)
     public ResponseEntity<ErrorDetails> handleEmailAlreadyExistException(EmailAlreadyExistException exception, WebRequest webRequest){
 
         return new ResponseEntity<>(mapToErrorDetails(exception, "USER_EMAIL_ALREADY_EXISTS", webRequest), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SubscriptionTypeException.class)
+    public ResponseEntity<ErrorDetails> handleSubscriptionTypeException(SubscriptionTypeException exception, WebRequest webRequest){
+        return new ResponseEntity<>(mapToErrorDetails(exception, "THIS_FEATURE_IS_ONLY_FOR_SUBSCRIBED_USERS", webRequest), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
