@@ -21,7 +21,9 @@ Before you begin, ensure you have the following prerequisites installed:
 
 ## Business Documentaion
 
-The below link is a power point slide that documents the problem statement, the value proposition and the identified users : https://docs.google.com/presentation/d/1TdVXoysbbSQgSfHAMzQYCcGfDc2XQt8rcjY6s8iqKeE/edit?usp=sharing
+This link
+[here](https://docs.google.com/presentation/d/1TdVXoysbbSQgSfHAMzQYCcGfDc2XQt8rcjY6s8iqKeE/edit?usp=sharing)
+is a power point slide that documents the problem statement, the value proposition and the identified users : 
 
 Also contained in this repo is a Project Description directory which contains the entity relationship diagram.
 
